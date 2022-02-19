@@ -141,6 +141,88 @@ kubectl edit deployment centraldashboard -n kubeflow
 kubectl rollout restart deployments/centraldashboard -n kubeflow
 ```
 
-#### HTTP certificates
+#### HTTP certificate
+
+A DNS domain should be available and configured for the IP address of the Kubernetes node where the `Istio` ingress will be deployed.
+
+An HTTPS certificate can be obtained from a provider or from [Let's Encrypt](https://letsencrypt.org/).
+
+- Create a new `Secret` manifest including the information from the key and the certificate:
+
+```yaml
+apiVersion: v1
+data:
+  tls.crt: <CERTIFICATE>
+  tls.key: <KEY>
+kind: Secret
+metadata:
+  name: istio-ingressgateway-certs
+  namespace: istio-system
+type: kubernetes.io/tls
+```
+
+- Create the object:
+
+```bash
+kubectl apply -f istio-ingressgateway-certs.yaml -n istio-system
+```
+
+- Apply the new configuration for Istio Ingress-Gateway:
+
+```bash
+kubectl apply -f deployment/gw_https.yaml
+```
 
 #### Authentication
+
+Authentication will rely on GitHub. 
+
+- Build only Dex configuration:
+
+```bash
+kustomize build common/dex/overlays/istio  > dex.yaml
+```
+
+- Modify dex.yaml with the following content:
+
+```yaml
+data:
+  config.yaml: |
+    issuer: <KUBEFLOW_DOMAIN>/dex
+    storage:
+      type: kubernetes
+      config:
+        inCluster: true
+    web:
+      http: 0.0.0.0:5556
+    logger:
+      level: "debug"
+      format: text
+    connectors:
+    - type: github
+      # Required field for connector id.
+      id: github
+      # Required field for connector name.
+      name: GitHub
+      config:
+        # Credentials can be string literals or pulled from the environment.
+        clientID: <GIHUB_CLIENT_ID>
+        clientSecret: <GIHUB_CLIENT_SECRET>
+        redirectURI: <KUBEFLOW_DOMAIN>/dex/callback
+    oauth2:
+      skipApprovalScreen: true
+    enablePasswordDB: true
+    staticPasswords:
+    - email: user@example.com
+      hash: $2y$12$kAJmOQmkeaq5lNN8z3v9E.rS8cvd8Rm8MR3EbcWDEwPsFqq8mbpFS
+      # https://github.com/dexidp/dex/pull/1601/commits
+      # FIXME: Use hashFromEnv instead
+      username: user
+      userID: "15841185641784"
+    staticClients:
+    # https://github.com/dexidp/dex/pull/1664
+    - idEnv: OIDC_CLIENT_ID
+      redirectURIs: ["/login/oidc"]
+      name: 'Dex Login Application'
+      secretEnv: OIDC_CLIENT_SECRET
+```
