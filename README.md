@@ -70,14 +70,77 @@ An additional configuration must be added in the cluster to avoid issues during 
 ```
 
 - Save the new configuration. It will take some time for the cluster to get updated.
+- Download the KubeConfig file
+- Set KUBECONFIG environmental variable to the path of the KubeConfig file:
+  
+```bash
+export KUBECONFIG=<path>
+```
 
-#### Creating a Kubernetes cluster
+#### Installing a StorageClass
 
+For the purpose of this guide, [NFS subdir external provisioner is being used](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner). A NFS server must be available.
 
-### Installation process
+The installation of the provisioner is done with the following command:
 
-## Additional configuration
+```bash
+helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --set nfs.server=<NFS_SERVER_IP_ADDRESS> --set nfs.path=<NFS_SERVER_PATH>
+```
 
-### HTTP certificates
+Mark the new `StorageClass` as default:
 
-### Authentication
+```bash
+kubectl patch storageclass nfs-client -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+### Kubeflow installation
+
+- Clone Kubeflow manifests, change to the appropriate branch and build Kubeflow configuration:
+
+```batch
+git clone https://github.com/kubeflow/manifests.git
+git checkout tags/v1.4.1
+kustomize build example > kubeflow.yaml
+```
+
+- Apply the yaml file:
+
+```bash
+kubectl apply -f kubeflow.yaml
+```
+
+It will take some time to deploy all the pods. You can check that everything is running:
+
+```bash
+kubectl get pods -n cert-manager
+kubectl get pods -n istio-system
+kubectl get pods -n auth
+kubectl get pods -n knative-eventing
+kubectl get pods -n knative-serving
+kubectl get pods -n kubeflow
+```
+
+In order to access the dashboard, port 80 of Istio Ingress-Gateway must be forwarded to the host:
+
+```bash
+kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
+```
+
+Then, the dashboard will be available in [`](http://localhost:8080)`. Default credentials are `user@example.com` and `12341234`.
+
+### Additional configuration
+
+#### Automatic profile creation
+
+When a new user get access to Kubeflow, profile and namespace must be created.
+
+For this, set `REGISTRATION_FLOW ` to `TRUE` by using:
+
+```bash
+kubectl edit deployment centraldashboard -n kubeflow
+kubectl rollout restart deployments/centraldashboard -n kubeflow
+```
+
+#### HTTP certificates
+
+#### Authentication
