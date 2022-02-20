@@ -226,3 +226,15 @@ data:
       name: 'Dex Login Application'
       secretEnv: OIDC_CLIENT_SECRET
 ```
+
+#### Using Kubeflow Pipelines from Jupyter notebooks
+
+Since for FlexiGroBots, Kubeflow has been deployed using a multi-user mode, an additional configuration must be done so that it is possible to call Pipelines from Juypyter notebooks.
+
+For each new user, replace `<YOUR_USER_PROFILE_NAMESPACE>` in `deployment/pod_default_multiuser.yaml`.
+
+Create the new resources:
+
+```bash
+kubectl apply -f deployment/pod_default_multiuser.yaml
+```
