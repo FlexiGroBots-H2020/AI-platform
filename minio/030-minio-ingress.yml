@@ -1,0 +1,16 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio
+  namespace: minio
+
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`minio.platform.flexigrobots-h2020.eu`)
+      kind: Rule
+      services:
+        - name: minio
+          port: 9001
