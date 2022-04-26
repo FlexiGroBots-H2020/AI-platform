@@ -1,0 +1,20 @@
+###############################
+# acme.json storage
+# This configuration obejct is optional and can be used to store the traefik acme.json file 
+# in a longhorn persistence volume named 'traefik-data'
+# To enable the persistence storage you need to uncomment the volumeMouns in the 002-deployment.yml file. 
+###############################
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: traefik-certs-pvc
+  namespace: kube-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-storageclass
+  resources:
+    requests:
+      storage: 50Mi
+---
