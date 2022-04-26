@@ -1,0 +1,89 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: kube-system
+  name: traefik-ingress-controller
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: kube-system
+  name: traefik
+  labels:
+    app: traefik
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      securityContext:
+        # Use nogroup (and needs nobody) for the acme.json file
+        # for storing TLS
+        fsGroup: 65534
+      initContainers:
+        - name: volume-permissions
+          image: busybox:1.32
+          command: ['sh', '-c', 'touch /etc/traefik/certs/acme.json && chown 65534:65534 /etc/traefik/certs/acme.json && chmod 600 /etc/traefik/certs/acme.json']
+          volumeMounts:
+            - name: certificates
+              mountPath: /etc/traefik/certs
+      containers:
+        - name: traefik
+          image: traefik:v2.6.1
+          args:
+            - --api.dashboard=true
+            - --ping=true
+            - --accesslog
+            - --entrypoints.traefik.address=:9080
+            - --entrypoints.web.address=:8080
+            - --entrypoints.websecure.address=:8443
+            - --entrypoints.web.http.redirections.entrypoint.to=:443
+            - --entrypoints.web.http.redirections.entrypoint.scheme=https
+            - --providers.kubernetescrd
+            - --providers.kubernetescrd.allowCrossNamespace=true
+            - --providers.kubernetesingress
+            - --log
+            - --log.level=INFO
+            - --certificatesresolvers.default.acme.email=daniel.calvo@atos.net
+            - --certificatesresolvers.default.acme.storage=/etc/traefik/certs/acme.json
+            - --certificatesresolvers.default.acme.tlschallenge=true
+            # Production
+            - --certificatesresolvers.default.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+            # Staging
+            # --certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+            # Please note that this is the staging Let's Encrypt server.
+            # Once you get things working, you should remove that whole line altogether.
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            # Run the container as nobody:nogroup
+            runAsUser: 65534
+            runAsGroup: 65534
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            # The Traefik container is listening on ports > 1024 so the container
+            # can be run as a non-root user and they can bind to these ports.
+            - name: web
+              containerPort: 8080
+            - name: websecure
+              containerPort: 8443
+            - name: admin
+              containerPort: 9080
+          volumeMounts:
+            - name: certificates
+              mountPath: /etc/traefik/certs
+      volumes:
+        - name: certificates
+          persistentVolumeClaim:
+            claimName: traefik-certs-pvc
