@@ -1,0 +1,18 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-cli-tls
+  namespace: minio
+
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`minio-cli.platform.flexigrobots-h2020.eu`)
+      kind: Rule
+      services:
+        - name: minio-cli
+          port: 9000
+  tls:
+    certResolver: default
