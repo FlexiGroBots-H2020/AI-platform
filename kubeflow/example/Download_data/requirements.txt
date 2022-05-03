@@ -1,0 +1,4 @@
+pandas
+minio
+certifi
+urllib3

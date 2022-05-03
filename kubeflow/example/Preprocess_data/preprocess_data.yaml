@@ -1,0 +1,21 @@
+name: Preprocess data
+description: Preprocess data
+
+inputs:
+- {name: Data, type: LocalPath, description: 'Path where data is stored.'}
+outputs:
+- {name: Output, type: LocalPath, description: 'Path where output data is stored'}
+
+implementation:
+  container:
+    image: jarmirecio/preprocess_data_flexi
+    command: [
+      python, preprocess_data.py,
+
+      --input_path,
+      {inputPath: Data},
+
+      --output_path,
+      {outputPath: Output},
+
+    ]

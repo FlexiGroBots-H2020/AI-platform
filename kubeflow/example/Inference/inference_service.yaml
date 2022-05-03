@@ -1,0 +1,14 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+    labels:
+        controller-tools.k8s.io: "1.0"
+    name: kserve-demo
+    namespace: "$NAMESPACE"
+    annotations: 
+        sidecar.istio.io/inject: "false"
+spec:
+    predictor:
+        containers:
+            - name: kserve-container
+              image: jarmirecio/inference_kserve_0_7_0_flexi

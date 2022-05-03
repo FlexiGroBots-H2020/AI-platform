@@ -1,0 +1,21 @@
+name: Train Model
+description: Trains a simple neural network
+
+inputs:
+- {name: Data, type: LocalPath, description: 'Path where data is stored.'}
+outputs:
+- {name: Accuracy, type: Float, description: 'Path where accuracy metric is stored'}
+
+implementation:
+  container:
+    image: jarmirecio/train_model_flexi
+    command: [
+      python, train_model.py,
+
+      --data,
+      {inputPath: Data},
+
+      --accuracy,
+      {outputPath: Accuracy},
+
+    ]
