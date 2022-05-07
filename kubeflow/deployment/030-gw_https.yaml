@@ -1,0 +1,26 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: kubeflow-gateway
+  namespace: kubeflow
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - '*'
+    port:
+      name: http
+      number: 80
+      protocol: HTTP
+  - hosts:
+    - 'kubeflow.flexigrobots-h2020.eu'
+    port:
+      name: https
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      #privateKey: /etc/istio/ingressgateway-certs/tls.key
+      #serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+      credentialName: kubeflow-domain-cert-prod # This should match the Certificate secretName

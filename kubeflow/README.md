@@ -143,26 +143,18 @@ kubectl rollout restart deployments/centraldashboard -n kubeflow
 
 A DNS domain should be available and configured for the IP address of the Kubernetes node where the `Istio` ingress will be deployed.
 
-An HTTPS certificate can be obtained from a provider or from [Let's Encrypt](https://letsencrypt.org/).
+An HTTPS certificate can be obtained from a provider or from [Let's Encrypt](https://letsencrypt.org/). The following steps can be used to automate the retrieval of a certificate:
 
-- Create a new `Secret` manifest including the information from the key and the certificate:
-
-```yaml
-apiVersion: v1
-data:
-  tls.crt: <CERTIFICATE>
-  tls.key: <KEY>
-kind: Secret
-metadata:
-  name: istio-ingressgateway-certs
-  namespace: istio-system
-type: kubernetes.io/tls
-```
-
-- Create the object:
+- Create two `Issuer` objects for staging and production environments.
 
 ```bash
-kubectl apply -f istio-ingressgateway-certs.yaml -n istio-system
+kubectl apply -f 010-issuer.yml
+```
+
+- Create two `Certificate` objects for staging and production environments.
+
+```bash
+kubectl apply -f 020-certificates.yml
 ```
 
 - Apply the new configuration for Istio Ingress-Gateway:
@@ -229,10 +221,10 @@ data:
 
 Since for FlexiGroBots, Kubeflow has been deployed using a multi-user mode, an additional configuration must be done so that it is possible to call Pipelines from Juypyter notebooks.
 
-For each new user, replace `<YOUR_USER_PROFILE_NAMESPACE>` in `deployment/pod_default_multiuser.yaml`.
+For each new user, replace `<YOUR_USER_PROFILE_NAMESPACE>` in `deployment/040-pod_default_multiuser.yaml`.
 
 Create the new resources:
 
 ```bash
-kubectl apply -f deployment/pod_default_multiuser.yaml
+kubectl apply -f 040-pod_default_multiuser.yaml
 ```
