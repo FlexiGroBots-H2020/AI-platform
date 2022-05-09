@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kubeflow-domain-cert-staging
+  namespace: istio-system
+spec:
+  secretName: kubeflow-domain-cert-staging
+  dnsNames:
+  - kubeflow.flexigrobots-h2020.eu
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kubeflow-domain-cert-prod
+  namespace: istio-system
+spec:
+  secretName: kubeflow-domain-cert-prod
+  dnsNames:
+  - kubeflow.flexigrobots-h2020.eu
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
