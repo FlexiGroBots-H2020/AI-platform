@@ -8,7 +8,7 @@ outputs:
 
 implementation:
   container:
-    image: jarmirecio/preprocess_data_flexi
+    image: ghcr.io/flexigrobots-h2020/kubeflow-example-preprocessing:latest
     command: [
       python, preprocess_data.py,
 

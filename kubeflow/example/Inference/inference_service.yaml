@@ -11,4 +11,4 @@ spec:
     predictor:
         containers:
             - name: kserve-container
-              image: jarmirecio/inference_kserve_0_7_0_flexi
+              image: ghcr.io/flexigrobots-h2020/kubeflow-example-inference:latest

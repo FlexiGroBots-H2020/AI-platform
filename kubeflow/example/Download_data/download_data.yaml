@@ -6,7 +6,7 @@ outputs:
 
 implementation:
   container:
-    image: jarmirecio/download_data_flexi
+    image: ghcr.io/flexigrobots-h2020/kubeflow-example-download-data:latest
     command: [
       python, download_data.py,
 

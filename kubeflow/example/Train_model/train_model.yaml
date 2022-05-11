@@ -8,7 +8,7 @@ outputs:
 
 implementation:
   container:
-    image: jarmirecio/train_model_flexi
+    image: ghcr.io/flexigrobots-h2020/kubeflow-example-training:latest
     command: [
       python, train_model.py,
 
