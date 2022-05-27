@@ -36,19 +36,25 @@ sudo apt-get install kubectl
 
 The following steps describe the process to create a single-node Kubernetes cluster. These are the characteristics of the node:
 
-- 4 cores
-- RAM memory: 32 GB.
-- HDD: 4TB.
+- 64 cores
+- RAM memory: 124GB.
+- 2x960GB SSD, RAID 0.
 - Operating system: Ubuntu 20.04 LTS
 - Docker (20.10.12) and UFW (v0.36) installed.
 - Open ports: 2379, 2049, 8080, 80.
+
+The installation would be possible with a less powerful machine. For instance:
+
+- 4 cores
+- RAM memory: 32 GB.
+- HDD: 4TB.
 
 For this guide, [Rancher 2.6](https://rancher.com/docs/rancher/v2.6/en/) has been used to create the Kubernetes cluster. 
 
 - In the home page, select `Create`.
 - Select the option, `Custom - Use existing nodes and create a cluster using RKE`.
 - Add a name for the new cluster.
-- Select as Kubernetes version `v1.21.9-racher-1-1`.
+- Select as Kubernetes version `v1.21.12`.
 - Let the rest of the options with default values and press `Next`.
 - Choose the roles for the first node in the cluster. Note that this part will strongly depend in the specific configuration of the target cluster. In this case, a single node cluster will be used. Therefore, select as `Node Role` the three options: `etcd`, `Control Plane` and `Worker`.
 - Copy the command provided by Rancher and execute it in the node where Kubernetes will be installed.
@@ -97,7 +103,24 @@ kubectl patch storageclass nfs-client -p '{"metadata": {"annotations":{"storagec
 
 ```batch
 git clone https://github.com/kubeflow/manifests.git
-git checkout tags/v1.4.1
+git checkout tags/v1.5.0
+```
+
+Modify configuration file for OIDC provider. In `common/oidc-authservice/base/params.env`:
+
+```yaml
+OIDC_PROVIDER=https://<KUBEFLOW DOMAIN>/dex
+```
+
+Modify configuration file so that namespaces are created automatically when a new user uses the platform. In `apps/centraldashboard/upstream/base/params.env`:
+
+```yaml
+CD_REGISTRATION_FLOW=true
+```
+
+- Build the Kubeflow configuration:
+
+```
 kustomize build example > kubeflow.yaml
 ```
 
@@ -217,14 +240,79 @@ data:
       secretEnv: OIDC_CLIENT_SECRET
 ```
 
-#### Using Kubeflow Pipelines from Jupyter notebooks
+## Using GPU
 
-Since for FlexiGroBots, Kubeflow has been deployed using a multi-user mode, an additional configuration must be done so that it is possible to call Pipelines from Juypyter notebooks.
+In order to use an Nvidia GPU with Kubernetes and Kubeflow, [NVIDIA Cloud Native Documentation](https://docs.nvidia.com/datacenter/cloud-native/contents.html) must be installed.
 
-For each new user, replace `<YOUR_USER_PROFILE_NAMESPACE>` in `deployment/040-pod_default_multiuser.yaml`.
+The following instructions come directly from this page.
 
-Create the new resources:
+### Setting up NVIDIA Container Toolkit
+
+In the node with the GPU the following commands must be applied.
+
+Setup the package repository and the GPG key:
 
 ```bash
-kubectl apply -f 040-pod_default_multiuser.yaml
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+      && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+      && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+```
+
+Install the `nvidia-docker2` package (and dependencies) after updating the package listing:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
+```
+
+Restart the Docker daemon to complete the installation after setting the default runtime:
+
+```bash
+sudo systemctl restart docker
+At this point, a working setup can be tested by running a base CUDA container:
+```
+
+```bash
+sudo docker run --rm --gpus all nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
+```
+
+```bash
+This should result in a console output shown below:
+
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 450.51.06    Driver Version: 450.51.06    CUDA Version: 11.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla T4            On   | 00000000:00:1E.0 Off |                    0 |
+| N/A   34C    P8     9W /  70W |      0MiB / 15109MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+```
+
+### Install NVIDIA GPU Operator
+
+Add the NVIDIA Helm repository:
+
+```bash
+helm repo add nvidia https://helm.ngc.nvidia.com/nvidia \
+   && helm repo update
+```
+
+Since NVIDIA drivers have been installed in the previous step, NVIDIA GPU operator will be installed indicating this option.
+
+```bash
+ helm install --wait --generate-name      -n gpu-operator --create-namespace      nvidia/gpu-operator      --set driver.enabled=false
 ```
