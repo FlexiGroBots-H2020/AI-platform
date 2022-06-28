@@ -79,11 +79,22 @@ Once the Kubeflow notebook is ready, users can connect to it and upload the Jupy
 
 ![](/kubeflow/example/pics/Upload.PNG)
 
+It is also possible to clone the repository containing the example (https://github.com/FlexiGroBots-H2020/AI-platform.git) as shown in the following screenshot:
+
+![](/kubeflow/example/pics/Clone.PNG)
+
+Then, you will find the example code in the following directory:
+
+```
+~/AI-platform/kubeflow/example
+```
 
 ### Uploading pipeline
 After creating the pipeline, it has to be uploaded to Kubeflow before running. In the paragraph "Upload pipeline" of [the main notebook](/kubeflow/example/demo-notebook.ipynb) can be found this process.
 
 It is important to change the name of the pipeline in this piece of code because, it is not allowed two pipelines with the same name.
+In the example, this issue is solved by random name generation,
+but you can always choose one you like best.
 
 ### Running pipeline
 The last step of a Kubeflow service deployment consists on running the pipeline that has been created after uploading it.
