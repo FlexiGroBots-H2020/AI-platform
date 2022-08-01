@@ -116,6 +116,21 @@ Mark the new `StorageClass` as default:
 kubectl patch storageclass nfs-client -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 ```
 
+Note:
+if a node is added to the Kubernetes cluster after the NFS StorageClass has been installed,
+you may need to modify configuration in ```/etc/exports``` to ensure access to NFS from the new node.
+Example of adding new node with public IP ```5.79.113.30```:
+
+```diff
+--- /etc/exports     2022-08-01 07:10:20.114506376 +0000
++++ /etc/exports     2022-08-01 07:10:00.053658443 +0000
+@@ -10,4 +10,5 @@
+ #
+ <NFS_SERVER_PATH> 213.227.145.0/16(rw,no_root_squash,no_subtree_check)
+ <NFS_SERVER_PATH> 62.212.86.0/16(rw,no_root_squash,no_subtree_check)
++<NFS_SERVER_PATH> 5.79.113.0/16(rw,no_root_squash,no_subtree_check)
+```
+
 #### Installing MetalLB
 
 Depending on the configuration applied during cluster creation (i.e.: enabling or not Nginx Ingress in Rancher), you may need to install MetalLB. MetalLB provides a load-balancer implementation which allows to create Kubernetes services of type `LoadBalancer` (more details [here](https://metallb.org/concepts/)).
