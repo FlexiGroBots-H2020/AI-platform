@@ -19,7 +19,7 @@ def getMinioClient( easier_user, easier_password, easier_url="minio-cli.platform
 
 def _download_data(args):
     logging.info("Downloading Data")
-    load_dotenv()
+    load_dotenv("../.env")
     minioClient = getMinioClient(easier_user=os.getenv('MINIO_ACCESS_KEY'),easier_password=os.getenv('MINIO_SECRET_KEY'))
     obj = minioClient.get_object('atos-demo-data', 'synthetic_data_with_target.csv')
     data = pd.read_csv(obj, index_col=0)
