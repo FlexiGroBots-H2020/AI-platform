@@ -10,7 +10,7 @@ The pipeline is composed of the following components:
 ###  Interacting with MinIO
 
 #### Connecting with MinIO
-First of all, to work with MinIO is necessary to connect with the MinIO server. For this reason, the user has to introduce the identification credentials. For security reasons, these values are read from environment variables. Accordingly, an .env file has to be created inside the [example](kubeflow\example\.env) folder. The credentials values in the .env are: 
+First of all, it is necessary to connect with the [MinIO](https://minio.platform.flexigrobots-h2020.eu/) server. For this reason, the user has to introduce the identification credentials. For security reasons, these values are read from environment variables. Accordingly, an .env file has to be created inside the [example](kubeflow\example\.env) folder. The credentials values in the .env are: 
 
 ```bash
 MINIO_ACCESS_KEY=USER_EXAMPLE
