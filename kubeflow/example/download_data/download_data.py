@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 def getMinioClient( easier_user, easier_password, easier_url="minio-cli.platform.flexigrobots-h2020.eu", minio_secure=True, minio_region='es'):
     
-    minioClient = Minio(easier_url, access_key=easier_user, secret_key=easier_password, secure=True, region='es')
+    minioClient = Minio(easier_url, access_key= easier_user, secret_key=easier_password, secure=minio_secure, region=minio_region)
     return minioClient
 
 def _download_data(args):
