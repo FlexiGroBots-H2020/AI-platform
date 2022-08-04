@@ -8,7 +8,7 @@ The main objective of this pipeline is to perform the model training for a drivi
 The pipeline is composed of the following components:
 
 ### Connecting to MinIO
-First of all, it is necessary to connect with the [MinIO](https://minio.platform.flexigrobots-h2020.eu/) server. For this reason, the user has to introduce the identification credentials. For security reasons, these values are read from environment variables. Accordingly, an .env file has to be created inside the [example](kubeflow\example\) folder. The credentials values in the .env are: 
+First of all, it is necessary to connect with the [MinIO](https://minio.platform.flexigrobots-h2020.eu/) server. For this reason, the user has to introduce the identification credentials. For security reasons, these values are read from environment variables. Accordingly, an .env file has to be created inside the      [example](kubeflow/example/) folder. The credentials values in the .env are: 
 
 ```bash
 MINIO_ACCESS_KEY=USER_EXAMPLE
