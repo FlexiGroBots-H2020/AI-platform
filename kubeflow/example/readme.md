@@ -7,6 +7,14 @@ The main objective of this pipeline is to perform the model training for a drivi
 
 The pipeline is composed of the following components:
 
+### Connecting to MinIO
+First of all, it is necessary to connect with the [MinIO](https://minio.platform.flexigrobots-h2020.eu/) server. For this reason, the user has to introduce the identification credentials. For security reasons, these values are read from environment variables. Accordingly, an .env file has to be created inside the [example](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example) folder. The credentials values in the .env are: 
+
+```bash
+MINIO_ACCESS_KEY=USER_EXAMPLE
+MINIO_SECRET_KEY=PASSWORD_EXAMPLE
+```
+
 ### Downloading data
 This component implements the necessary logic to download the dataset, that will feed the model, from FlexiGroBots' [MinIO](https://minio.platform.flexigrobots-h2020.eu/).
 
@@ -32,15 +40,15 @@ After training, the model is stored in the FlexiGroBots' MinIO.
 ## Steps to deploy a pipeline
 
 ### Developing the logic of each component 
-The first step to deploy a pipeline is to develop the logic of all component that build this pipeline. In this example, the pipeline is composed by three components, so, it is needed to code three diferent Python files for each one. These scripts are: [downloading data](/kubeflow/example/Download_data/download_data.py), [preprocessing data](/kubeflow/example/Preprocess_data/preprocess_data.py) and [model training](/kubeflow/example/Train_model/train_model.py).
+The first step to deploy a pipeline is to develop the logic of all component that build this pipeline. In this example, the pipeline is composed by three components, so, it is needed to code three diferent Python files for each one. These scripts are: [downloading data](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Download_data/download_data.py), [preprocessing data](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Preprocess_data/preprocess_data.py) and [model training](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Train_model/train_model.py).
 
 ### Specifying requirements
-Before creating a container from these Python files, it is mandatory to freeze the necessary libraries as requirements to install. In [downloading libraries](/kubeflow/example/Download_data/requirements.txt), [preprocessing libraries](/kubeflow/example/Preprocess_data/requirements.txt) and [training libraries](/kubeflow/example/Train_model/requirements.txt) it can be observed the most important libraries to take into account and its version.
+Before creating a container from these Python files, it is mandatory to freeze the necessary libraries as requirements to install. In [downloading libraries](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Download_data/requirements.txt), [preprocessing libraries](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Preprocess_data/requirements.txt) and [training libraries](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Train_model/requirements.txt) it can be observed the most important libraries to take into account and its version.
 
 ### Dockerizing
 
 #### Dockerfiles
-Once logic and requirements files are ready, it is the moment to develop three different, but similar, Dockerfiles which allow to create three containers from the initial Python files, installing all necessary libraries. Next files contains all commands to create the containers: [downloading Dockerfile](/kubeflow/example/Download_data/Dockerfile), [preprocessing Dockerfile](/kubeflow/example/Preprocess_data/Dockerfile) and [training Dockerfile](/kubeflow/example/Train_model/Dockerfile).
+Once logic and requirements files are ready, it is the moment to develop three different, but similar, Dockerfiles which allow to create three containers from the initial Python files, installing all necessary libraries. Next files contains all commands to create the containers: [downloading Dockerfile](/kubeflow/example/Download_data/Dockerfile), [preprocessing Dockerfile](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Preprocess_data/Dockerfile) and [training Dockerfile](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/examplehttps://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Train_model/Dockerfile).
 
 #### Building and pushing the container
 After coding the Dockerfile, it is necessary to build each image and to push it to a remote repository where it can be accessible to use.
@@ -60,10 +68,10 @@ docker push <remote_repo_name>/<image_name>
 ```
 
 ### Using docker images
-These three docker images, that have been generated in previous steps, will be used in different .yaml files as the containers of the desired implementation. This procedure can be found in: [downloading yaml file](/kubeflow/example/Download_data/download_data.yaml), [preprocessing yaml file](/kubeflow/example/Preprocess_data/preprocess_data.yaml) and [training yaml file](/kubeflow/example/Train_model/train_model.yaml).
+These three docker images, that have been generated in previous steps, will be used in different .yaml files as the containers of the desired implementation. This procedure can be found in: [downloading yaml file](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/Download_data/download_data.yaml), [preprocessing yaml file](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/preprocess_data/preprocess_data.yaml) and [training yaml file](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/train_model/train_model.yaml).
 
 ### Defining and creating the pipeline
-Once all .yaml files are ready, each of them will be used to define each development as a Kubeflow component. The code that explain this definition process can be found in [the main notebook](/kubeflow/example/demo-notebook.ipynb) of the example, specifically, in the "Define Kubeflow Pipeline and then create service" paragraph.
+Once all .yaml files are ready, each of them will be used to define each development as a Kubeflow component. The code that explain this definition process can be found in [the main notebook](https://github.com/FlexiGroBots-H2020/AI-platform/tree/master/kubeflow/example/demo-notebook.ipynb) of the example, specifically, in the "Define Kubeflow Pipeline and then create service" paragraph.
 
 To run this Jupyter notebook inside a Kubeflow workspace, firstly, users have to create a new Kubeflow notebook (if there is no one created yet):
 
