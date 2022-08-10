@@ -71,7 +71,11 @@ To run this Jupyter notebook inside a Kubeflow workspace, firstly, users have to
 
 
 When creating this Kubeflow notebook, users have to specify the name for this notebook and what kind of image the notebook will use.
-If needed, GPU resources must also be explicitly determined:
+If needed, GPU resources must also be explicitly determined.
+
+Note: it has been noted that a sufficient amount of memory (at least 4Gi) must be
+provisioned to avoid Jupyter's kernel restarts when using CUDA. It is also
+recommended to increase the default "Requested CPUs" value.
 
 ![](/kubeflow/example/pics/Notebook_details.PNG)
 
