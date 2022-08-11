@@ -412,6 +412,12 @@ spec:
 kubectl apply -f deployment/040-pod_default_multiuser.yaml
 ```
 
+This task can be automated by running the `deployment/create_PodDefault.sh` script:
+
+```bash
+./create_PodDefault.sh <USER_PROFILE_NAMESPACE>
+```
+
 ## Using GPU
 
 In order to use an Nvidia GPU with Kubernetes and Kubeflow, [NVIDIA Cloud Native Documentation](https://docs.nvidia.com/datacenter/cloud-native/contents.html) must be installed.
