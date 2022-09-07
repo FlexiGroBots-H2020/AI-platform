@@ -188,7 +188,7 @@ kubectl apply -f deployment/gw_https.yaml
 
 #### Authentication
 
-Authentication will rely on GitHub. 
+Authentication will rely on GitHub. In addition, a particular organisation's team has been allowed to access the kubeflow pod.  
 
 - Build only Dex configuration:
 
@@ -222,9 +222,17 @@ data:
         clientID: <GIHUB_CLIENT_ID>
         clientSecret: <GIHUB_CLIENT_SECRET>
         redirectURI: <KUBEFLOW_DOMAIN>/dex/callback
+        orgs:
+        - name: Organization's name
+          team:
+          - Team's name
+        loadAllGroups: true
+        useLoginAsID: true
+
     oauth2:
       skipApprovalScreen: true
-    enablePasswordDB: true
+    # enablePasswordDB is used to log-in with an e-mail. If you want to use a mail change to true
+    enablePasswordDB: false
     staticPasswords:
     - email: user@example.com
       hash: $2y$12$kAJmOQmkeaq5lNN8z3v9E.rS8cvd8Rm8MR3EbcWDEwPsFqq8mbpFS
