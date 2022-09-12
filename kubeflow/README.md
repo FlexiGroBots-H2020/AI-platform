@@ -147,7 +147,14 @@ In order to access the dashboard, port 80 of Istio Ingress-Gateway must be forwa
 kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
 ```
 
-Then, the dashboard will be available in [`](http://localhost:8080)`. Default credentials are `user@example.com` and `12341234`.
+Then, the dashboard will be available in `(http://localhost:8080)`. Default credentials are `user@example.com` and `12341234`.
+
+- In case the cluster is not accessible, the service `istio-ingressgateway` must be exposed through an external IP. With this purpose, the type of service must be changed from `Node Port` to `Load Balancer`. It can be done by modifying the manifest associated to the service `istio-ingressgateway`:
+
+```yaml
+    spec:
+      type: LoadBalancer
+```
 
 ### Additional configuration
 
@@ -183,7 +190,7 @@ kubectl apply -f 020-certificates.yml
 - Apply the new configuration for Istio Ingress-Gateway:
 
 ```bash
-kubectl apply -f deployment/gw_https.yaml
+kubectl apply -f 030-gw_https.yaml
 ```
 
 #### Authentication
@@ -315,4 +322,12 @@ Since NVIDIA drivers have been installed in the previous step, NVIDIA GPU operat
 
 ```bash
  helm install --wait --generate-name      -n gpu-operator --create-namespace      nvidia/gpu-operator      --set driver.enabled=false
+```
+
+## Troubleshooting
+
+- If the pod `training-operator` is not properly started (it is constantly restarting, presents `CrashLoopBackOff` status,...), the image associated to it can be reinstalled using the command below:
+
+```bash
+kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.5.0"
 ```

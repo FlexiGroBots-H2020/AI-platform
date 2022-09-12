@@ -1,0 +1,150 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: demo-pipeline-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.13, pipelines.kubeflow.org/pipeline_compilation_time: '2022-08-24T14:05:02.896788',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "Fits a simple neural network",
+      "name": "demo_pipeline"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.13}
+spec:
+  entrypoint: demo-pipeline
+  templates:
+  - name: demo-pipeline
+    dag:
+      tasks:
+      - {name: download-data-function, template: download-data-function}
+      - name: preprocess-data
+        template: preprocess-data
+        dependencies: [download-data-function]
+        arguments:
+          artifacts:
+          - {name: download-data-function-Data, from: '{{tasks.download-data-function.outputs.artifacts.download-data-function-Data}}'}
+      - name: show-results
+        template: show-results
+        dependencies: [train-model]
+        arguments:
+          parameters:
+          - {name: train-model-Accuracy, value: '{{tasks.train-model.outputs.parameters.train-model-Accuracy}}'}
+      - name: train-model
+        template: train-model
+        dependencies: [preprocess-data]
+        arguments:
+          artifacts:
+          - {name: preprocess-data-Output, from: '{{tasks.preprocess-data.outputs.artifacts.preprocess-data-Output}}'}
+  - name: download-data-function
+    container:
+      args: []
+      command: [python, download_data.py, --data, /tmp/outputs/Data/data]
+      image: ghcr.io/flexigrobots-h2020/kubeflow-example-download-data:latest
+    outputs:
+      artifacts:
+      - {name: download-data-function-Data, path: /tmp/outputs/Data/data}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.13
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+      annotations: {pipelines.kubeflow.org/component_spec: '{"description": "Download
+          data from minio", "implementation": {"container": {"command": ["python",
+          "download_data.py", "--data", {"outputPath": "Data"}], "image": "ghcr.io/flexigrobots-h2020/kubeflow-example-download-data:latest"}},
+          "name": "Download Data Function", "outputs": [{"description": "Path where
+          data will be stored.", "name": "Data", "type": "LocalPath"}]}', pipelines.kubeflow.org/component_ref: '{"digest":
+          "61fc9401514f0e8d720a2dbdcb8678f9aebd77293f8d946d675e3487081d3b06", "url":
+          "download_data/download_data.yaml"}'}
+  - name: preprocess-data
+    container:
+      args: []
+      command: [python, preprocess_data.py, --input_path, /tmp/inputs/Data/data, --output_path,
+        /tmp/outputs/Output/data]
+      image: ghcr.io/flexigrobots-h2020/kubeflow-example-preprocessing:latest
+    inputs:
+      artifacts:
+      - {name: download-data-function-Data, path: /tmp/inputs/Data/data}
+    outputs:
+      artifacts:
+      - {name: preprocess-data-Output, path: /tmp/outputs/Output/data}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.13
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+      annotations: {pipelines.kubeflow.org/component_spec: '{"description": "Preprocess
+          data", "implementation": {"container": {"command": ["python", "preprocess_data.py",
+          "--input_path", {"inputPath": "Data"}, "--output_path", {"outputPath": "Output"}],
+          "image": "ghcr.io/flexigrobots-h2020/kubeflow-example-preprocessing:latest"}},
+          "inputs": [{"description": "Path where data is stored.", "name": "Data",
+          "type": "LocalPath"}], "name": "Preprocess data", "outputs": [{"description":
+          "Path where output data is stored", "name": "Output", "type": "LocalPath"}]}',
+        pipelines.kubeflow.org/component_ref: '{"digest": "7a905dfe6e9966fac5a0c47e3c60a4c162cce614367a4dfc1949615135953252",
+          "url": "preprocess_data/preprocess_data.yaml"}'}
+  - name: show-results
+    container:
+      args: [--accuracy, '{{inputs.parameters.train-model-Accuracy}}']
+      command:
+      - sh
+      - -ec
+      - |
+        program_path=$(mktemp)
+        printf "%s" "$0" > "$program_path"
+        python3 -u "$program_path" "$@"
+      - |
+        def show_results(accuracy):
+            print(f"Accuracy of neural network: {accuracy}")
+
+        import argparse
+        _parser = argparse.ArgumentParser(prog='Show results', description='')
+        _parser.add_argument("--accuracy", dest="accuracy", type=float, required=True, default=argparse.SUPPRESS)
+        _parsed_args = vars(_parser.parse_args())
+
+        _outputs = show_results(**_parsed_args)
+      image: python:3.7
+    inputs:
+      parameters:
+      - {name: train-model-Accuracy}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.13
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+      annotations: {pipelines.kubeflow.org/component_spec: '{"implementation": {"container":
+          {"args": ["--accuracy", {"inputValue": "accuracy"}], "command": ["sh", "-ec",
+          "program_path=$(mktemp)\nprintf \"%s\" \"$0\" > \"$program_path\"\npython3
+          -u \"$program_path\" \"$@\"\n", "def show_results(accuracy):\n    print(f\"Accuracy
+          of neural network: {accuracy}\")\n\nimport argparse\n_parser = argparse.ArgumentParser(prog=''Show
+          results'', description='''')\n_parser.add_argument(\"--accuracy\", dest=\"accuracy\",
+          type=float, required=True, default=argparse.SUPPRESS)\n_parsed_args = vars(_parser.parse_args())\n\n_outputs
+          = show_results(**_parsed_args)\n"], "image": "python:3.7"}}, "inputs": [{"name":
+          "accuracy", "type": "Float"}], "name": "Show results"}', pipelines.kubeflow.org/component_ref: '{}',
+        pipelines.kubeflow.org/arguments.parameters: '{"accuracy": "{{inputs.parameters.train-model-Accuracy}}"}'}
+  - name: train-model
+    container:
+      args: []
+      command: [python, train_model.py, --data, /tmp/inputs/Data/data, --accuracy,
+        /tmp/outputs/Accuracy/data]
+      image: ghcr.io/flexigrobots-h2020/kubeflow-example-training:latest
+    inputs:
+      artifacts:
+      - {name: preprocess-data-Output, path: /tmp/inputs/Data/data}
+    outputs:
+      parameters:
+      - name: train-model-Accuracy
+        valueFrom: {path: /tmp/outputs/Accuracy/data}
+      artifacts:
+      - {name: train-model-Accuracy, path: /tmp/outputs/Accuracy/data}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.13
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+      annotations: {pipelines.kubeflow.org/component_spec: '{"description": "Trains
+          a simple neural network", "implementation": {"container": {"command": ["python",
+          "train_model.py", "--data", {"inputPath": "Data"}, "--accuracy", {"outputPath":
+          "Accuracy"}], "image": "ghcr.io/flexigrobots-h2020/kubeflow-example-training:latest"}},
+          "inputs": [{"description": "Path where data is stored.", "name": "Data",
+          "type": "LocalPath"}], "name": "Train Model", "outputs": [{"description":
+          "Path where accuracy metric is stored", "name": "Accuracy", "type": "Float"}]}',
+        pipelines.kubeflow.org/component_ref: '{"digest": "4aa66a027fa24d1efa01991c153b72eaf57e49f8d8822cf3a7304a7aa1922e2f",
+          "url": "train_model/train_model.yaml"}'}
+  arguments:
+    parameters: []
+  serviceAccountName: pipeline-runner
