@@ -14,7 +14,7 @@ spec:
       number: 80
       protocol: HTTP
   - hosts:
-    - 'kubeflow.flexigrobots-h2020.eu'
+    - 'kubeflow.flexigrobots-h2020.eu' # This should match the Certificate "dnsName"
     port:
       name: https
       number: 443

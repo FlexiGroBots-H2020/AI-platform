@@ -5,7 +5,7 @@ metadata:
 spec:
   acme:
     server: https://acme-staging-v02.api.letsencrypt.org/directory
-    email: daniel.calvo@atos.net
+    email: ari-aida-tech@lists.atos.research.eu
     privateKeySecretRef:
       name: letsencrypt-staging
     solvers:
@@ -19,7 +19,7 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    email: daniel.calvo@atos.net
+    email: ari-aida-tech@lists.atos.research.eu
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod
