@@ -511,3 +511,71 @@ Since NVIDIA drivers have been installed in the previous step, NVIDIA GPU operat
 ```bash
 helm install --wait --generate-name -n gpu-operator --create-namespace nvidia/gpu-operator --set driver.enabled=false
 ```
+
+#### Time-slicing (optional)
+
+NVIDIA GPUs are now schedulable resources in Kubernetes.
+However, the previous configuration only allows for devices –including GPUs (as nvidia.com/gpu)–
+to be advertised as integer resources in Kubernetes and thus does not allow for oversubscription
+–this is, sharing the same GPU unit among different K8s resources.
+In this [article](https://developer.nvidia.com/blog/improving-gpu-utilization-in-kubernetes/)
+further information about oversubscribing GPUs in Kubernetes using time-slicing is explained.
+In summary, the following steps are required:
+
+Modify ```deployment/gpu-time-slicing-config.yaml``` to match the number of nvidia.com/gpu
+resources you want to advertise to Kubernetes:
+
+```diff
+--- a/kubeflow/deployment/gpu-time-slicing-config.yaml
++++ b/kubeflow/deployment/gpu-time-slicing-config.yaml
+@@ -16,4 +16,4 @@ sharing:
+   timeSlicing:
+     resources:
+     - name: nvidia.com/gpu
+-      replicas: 2
++      replicas: <4>
+```
+
+Then create a ```ConfigMap``` containing that configuration file:
+
+```bash
+kubectl create configmap time-slicing --from-file deployment/gpu-time-slicing-config.yaml -n gpu-operator
+```
+
+Finally, upgrade Operator's deployment.
+You will need to include your Operator's release name in the command below:
+
+```bash
+helm upgrade --wait \
+    -n gpu-operator \
+    gpu-operator-<1660041098> nvidia/gpu-operator \
+    --set driver.enabled=false \
+    --set devicePlugin.config.name=time-slicing \
+    --set devicePlugin.config.default=gpu-time-slicing-config.yaml
+```
+
+If the changes are applied successfully, inspecting the status of the node
+containing the physical GPU will show that the device plugin advertises
+the configured number of GPUs as allocatable:
+
+```bash
+kubectl describe node <GPU-node-name>
+
+...
+Capacity:
+  cpu:                64
+  ephemeral-storage:  102626232Ki
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             131363284Ki
+  nvidia.com/gpu:     2
+  pods:               110
+Allocatable:
+  cpu:                64
+  ephemeral-storage:  94580335255
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             131260884Ki
+  nvidia.com/gpu:     2
+  pods:               110
+```
