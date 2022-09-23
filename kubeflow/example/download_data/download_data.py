@@ -14,12 +14,28 @@ logging.basicConfig(level=logging.INFO)
 
 def getMinioClient( easier_user, easier_password, easier_url="minio-cli.platform.flexigrobots-h2020.eu", minio_secure=True, minio_region='es'):
     
+<<<<<<< HEAD
     minioClient = Minio(easier_url, access_key= easier_user, secret_key=easier_password, secure=minio_secure, region=minio_region)
+=======
+<<<<<<< HEAD
+    minioClient = Minio(easier_url, access_key=easier_user, secret_key=easier_password, secure=True, region='es')
+=======
+    minioClient = Minio(easier_url, access_key= easier_user, secret_key=easier_password, secure=minio_secure, region=minio_region)
+>>>>>>> cbf6d3d81f847bd19efb1a6656e031be5bbc1f85
+>>>>>>> master
     return minioClient
 
 def _download_data(args):
     logging.info("Downloading Data")
+<<<<<<< HEAD
     load_dotenv("../.env")
+=======
+<<<<<<< HEAD
+    load_dotenv()
+=======
+    load_dotenv("../.env")
+>>>>>>> cbf6d3d81f847bd19efb1a6656e031be5bbc1f85
+>>>>>>> master
     minioClient = getMinioClient(easier_user=os.getenv('MINIO_ACCESS_KEY'),easier_password=os.getenv('MINIO_SECRET_KEY'))
     obj = minioClient.get_object('atos-demo-data', 'synthetic_data_with_target.csv')
     data = pd.read_csv(obj, index_col=0)
