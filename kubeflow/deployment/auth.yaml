@@ -1,0 +1,51 @@
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2022-06-08T08:38:00Z"
+  name: dex
+  namespace: auth
+  
+apiVersion: v1
+
+data:
+  config.yaml: |
+    issuer: https://kubeflow.flexigrobots-h2020.eu/dex
+    storage:
+      type: kubernetes
+      config:
+        inCluster: true
+    web:
+      http: 0.0.0.0:5556
+    logger:
+      level: "debug"
+      format: text
+    connectors:
+    - type: github
+      # Required field for connector id.
+      id: github
+      # Required field for connector name.
+      name: GitHub
+
+      config:
+        # Credentials can be string literals or pulled from the environment.
+        clientID: c70a650f8553537d8724
+        clientSecret: 4ef723327d1fc33a30f3e6519f917250afdb7de6
+        redirectURI: https://kubeflow.flexigrobots-h2020.eu/dex/callback
+
+        orgs:
+        - name: FlexiGroBots-H2020
+          teams:
+          - kubeflow
+          
+        loadAllGroups: true
+        useLoginAsID: true
+    oauth2:
+      skipApprovalScreen: true
+    # enablePasswordDB is used to register with an e-mail. If you want to use a mail change to true
+    enablePasswordDB: false
+    staticClients:
+    # https://github.com/dexidp/dex/pull/1664
+    - idEnv: OIDC_CLIENT_ID
+      redirectURIs: ["/login/oidc"]
+      name: 'Dex Login Application'
+      secretEnv: OIDC_CLIENT_SECRET
+    ---
