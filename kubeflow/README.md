@@ -140,7 +140,7 @@ The installation can be done using Helm by issuing the following commands (more 
 
 ```bash
 helm repo add metallb https://metallb.github.io/metallb
-helm install metallb metallb/metallb
+helm install metallb metallb/metallb -n metallb-system --create-namespace
 ```
 
 Then you need to provide the IP(s) to assign to `LoadBalancer` services (more details [here](https://metallb.org/configuration/)).
