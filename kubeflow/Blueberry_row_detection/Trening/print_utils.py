@@ -36,7 +36,8 @@ def pretraining_prints(p_index,lr,stepovi,lambda_parametri,batch_size,loss_type,
         shutil.rmtree(logs_path)
         os.mkdir(logs_path)
 
-    save_model_path = logs_path + "/NN_model_ep_" + str(epochs) + "_" + script_name + "/"
+    #save_model_path = logs_path + "/NN_model_ep_" + str(epochs) + "_" + script_name + "/"
+    save_model_path = logs_path + "/"
     if not os.path.exists(save_model_path):
         os.mkdir(save_model_path)
     ime_foldera_za_upis = logs_path + "/LOGS_results_" + script_name + ".txt "
