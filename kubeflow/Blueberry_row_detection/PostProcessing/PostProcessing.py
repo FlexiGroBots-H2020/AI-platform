@@ -93,4 +93,4 @@ rezultati.to_csv('/mnt/results/res-' + x + '.csv')
 
 Minio_object= minioConector()
 Minio_object.uploadFiles("blueberry-results","res-" + x + ".csv",'/mnt/results/res-' + x + '.csv')
-Minio_object.uploadFiles("blueberry-results","best_model_" + x + ".csv", result_location)
+Minio_object.uploadFiles("blueberry-results","best_model_" + x + ".csv", best_result_location)
