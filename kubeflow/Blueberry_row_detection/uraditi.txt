@@ -1,0 +1,18 @@
+struktuirati github: Trening + test - svi njihovi kodovi
+standardizovati nazive dokera na engleskom
+
+#u docs fajlu
+lokaciju do dokera
+lokaciju do kodova
+
+
+
+#dodati putanje ka minio iz download i upload
+
+
+#Razdvojiti postprocessing na dve komponente - analiza i upload - uraditi sve potrebne komponente
+
+
+PRIORITETI:
+srediti docker image-e i linkove
+razdvojiti komponente i srediti putanje izmedju

@@ -29,7 +29,7 @@ print(sys.path)
 
 onlydirs = [f for f in listdir(path)]
 
-best_result = 0
+best_result = -1
 best_result_location = None
 result_location = None
 tmp_file = ''
@@ -86,11 +86,15 @@ print(best_result)
 print("best result location")
 print(best_result_location)
 
-x = datetime.datetime.now()
-x = str(x).replace(' ',';')
-rezultati.to_csv('/mnt/results/res-' + x + '.csv')
+if best_result_location != None:
+
+    x = datetime.datetime.now()
+    x = str(x).replace(' ',';')
+    rezultati.to_csv('/mnt/results/res-' + x + '.csv')
 
 
-Minio_object= minioConector()
-Minio_object.uploadFiles("blueberry-results","res-" + x + ".csv",'/mnt/results/res-' + x + '.csv')
-Minio_object.uploadFiles("blueberry-results","best_model_" + x + ".csv", best_result_location)
+    Minio_object= minioConector()
+    Minio_object.uploadFiles("blueberry-results","res-" + x + ".csv",'/mnt/results/res-' + x + '.csv')
+    Minio_object.uploadFiles("blueberry-results","best_model_" + x + ".pt", best_result_location)
+else:
+    print("No result")
