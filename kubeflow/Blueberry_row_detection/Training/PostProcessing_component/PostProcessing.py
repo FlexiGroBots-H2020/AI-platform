@@ -16,6 +16,7 @@ import datetime
 #path = '/home/jovyan/vol-1/logs/Train_BGFG_BCE_with_weightsUnet3/'
 parser = argparse.ArgumentParser(description='My program description')
 parser.add_argument('--new_location', type=str)
+parser.add_argument('--bucket_name', type=str)
 parser.add_argument('--log_location', type=str)
 args = parser.parse_args()
 
@@ -23,6 +24,12 @@ args = parser.parse_args()
 
 #path = '/mnt/logs/Train_BGFG_BCE_with_weightsUnet3/'
 path = args.new_location
+bucket_name = args.bucket_name
+log_location = args.log_location
+
+print("ovo je log location")
+print(log_location)
+
 
 sys.path.append(path)
 print(sys.path)
@@ -94,7 +101,7 @@ if best_result_location != None:
 
 
     Minio_object= minioConector()
-    Minio_object.uploadFiles("blueberry-results","res-" + x + ".csv",'/mnt/results/res-' + x + '.csv')
-    Minio_object.uploadFiles("blueberry-results","best_model_" + x + ".pt", best_result_location)
+    Minio_object.uploadFiles(bucket_name,"res-" + x + ".csv",'/mnt/results/res-' + x + '.csv')
+    Minio_object.uploadFiles(bucket_name,"best_model_" + x + ".pt", best_result_location)
 else:
     print("No result")
