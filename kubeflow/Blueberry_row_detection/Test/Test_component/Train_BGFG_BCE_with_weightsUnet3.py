@@ -26,7 +26,7 @@ def set_seed(seed):
     torch_manual_seed_cuda = torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
-    
+
     torch.autograd.set_detect_anomaly(False)
     torch.autograd.profiler.profile(False)
     torch.autograd.profiler.emit_nvtx(False)
@@ -37,7 +37,7 @@ def set_seed(seed):
     return torch_manual_seed, torch_manual_seed_cuda
 
 def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num_epochs, loss_type,Batch_size):
-    
+
 
     # lr = 1e-5
     # lambda_parametri = 1
@@ -62,7 +62,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     ####################
     ### data loading ###
     ####################
-    
+
     train_loader, valid_loader = data_loading(ime_foldera_za_upis,putanja_train,putanja_val,binary,p_index,net_type,batch_size)
 
     ####################
@@ -78,7 +78,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     # print(device)
     segmentation_net = model_init(num_channels,num_channels_lab,img_h,img_w,zscore,net_type,device,server,GPU_list)
     segmentation_net = torch.nn.DataParallel(segmentation_net, device_ids=[0]).to(device)
-    
+
     # print(summary(segmentation_net,(5,512,512)))
     ############################
     ### model initialization ###
@@ -101,47 +101,47 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     # Brojanje Iteracija
     global count_train
     global count_val
-    global es_min   
+    global es_min
     global epoch_model_last_save
     epoch_list = np.zeros([epochs])
     all_train_losses = np.zeros([epochs])
     all_validation_losses = np.zeros([epochs])
     all_lr =np.zeros([epochs])
     val_loss_es = torch.zeros(epochs)
-    
+
     for epoch in range(epochs):
 
         train_part = "Train"
         segmentation_net.train(mode=True)
         print("Epoch %d: Train[" % epoch, end="")
-        
+
         if server:
             start_train.record()
             torch.cuda.empty_cache()
         else:
             start_train = time.time()
         index_start = 0
-        
+
         batch_iou = torch.zeros(size=(len(train_loader.dataset.img_names),num_channels_lab*2),device=device,dtype=torch.float32)
         if loss_type == 'bce':
             batch_iou_bg = torch.zeros(size=(len(train_loader.dataset.img_names),2),device=device,dtype=torch.float32)
-        
+
 
         for input_var, target_var, batch_names_train in train_loader:
-        
+
             set_zero_grad(segmentation_net)
-            
+
             model_output = segmentation_net.forward(input_var)
             # mask_train = torch.logical_and(mask_train[:,0,:,:],mask_train[:,1,:,:])
             loss = loss_calc(loss_type,criterion,model_output,target_var,num_channels_lab,use_mask)
             loss.backward()
 
             optimizer.step()  # mnozi sa grad i menja weightove
-            
+
             train_losses.append(loss.data)
-            
+
             ######## update!!!!
-            
+
             index_end = index_start + len(batch_names_train)
             if loss_type == 'bce':
                 batch_iou[index_start:index_end, :],batch_iou_bg[index_start:index_end]= calc_metrics_pix(model_output, target_var, num_channels_lab,device,use_mask,loss_type)
@@ -154,7 +154,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
             ###########################################################
             ### iscrtavanje broja klasa i broja piskela i tako toga ###
             ###########################################################
-            
+
             if epoch == 0 and count_logs_flag:
                 count_freq = 2
                 tb_num_pix_num_classes(tb, count_train, count_train_tb, count_freq, num_channels_lab,\
@@ -166,7 +166,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
 
             tb_image_list_plotting(tb, tb_img_list, num_channels_lab, epoch, input_var, target_var,\
                  model_output, train_part, device, batch_names_train,use_mask,dataset,loss_type)
-        
+
             count_train += 1
             print("*", end="")
 
@@ -198,14 +198,14 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
         all_train_losses[epoch] = (torch.mean(torch.tensor(train_losses,dtype = torch.float32)))
         all_lr[epoch] = (optimizer.param_groups[0]['lr'])
 
-        
+
         if epoch !=0 and (epoch % stepovi)==0 :
             print("epoha: " + str(epoch) +" , uradjen step!")
-            
+
 
         print(" Validation[", end="")
         del train_part
-        
+
         if server:
             torch.cuda.empty_cache()
         train_part = "Valid"
@@ -216,7 +216,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
         else:
             start_val = time.time()
         index_start = 0
-        
+
         batch_iou = torch.zeros(size=(len(valid_loader.dataset.img_names),num_channels_lab*2),device=device,dtype=torch.float32)
         if loss_type == 'bce':
             batch_iou_bg = torch.zeros(size=(len(valid_loader.dataset.img_names),2),device=device,dtype=torch.float32)
@@ -250,7 +250,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
             count_val += 1
             print("*", end="")
 
-        index_miou = 0    
+        index_miou = 0
         scheduler.step(torch.mean(torch.tensor(validation_losses)))
         ##############################################################
         ### Racunanje finalne metrike nad celim validacionim setom ###
@@ -264,7 +264,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
         else:
             print("Error: Unimplemented loss type!")
             sys.exit(0)
-        
+
         if server:
             end_val.record()
             torch.cuda.synchronize()
@@ -286,9 +286,9 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
         ##############################################################
         ### ispisivanje loss vrednosti za datu epohu u tensorboard ###
         ##############################################################
-        
+
         tb_add_epoch_losses(tb,train_losses,validation_losses,epoch)
-        
+
         early_stop = early_stopping(epoch, val_loss_es, all_validation_losses, es_check, \
             segmentation_net, save_model_path, save_checkpoint_freq, ime_foldera_za_upis,es_min,epoch_model_last_save,es_epoch_count,save_best_model,early_stop_flag,lr,stepovi,lambda_parametri,loss_type,net_type,batch_size)
         if early_stop:
@@ -317,7 +317,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
 
     if do_testing:
         criterion_1 = criterion
-        
+
         test_loader = AgroVisionDataLoader(img_size, putanja_test, img_data_format, p_index, # umesto p_indexa shuffle parametar stoji po difoltu ,
                                            batch_size, device, zscore,binary,dataset)
         uporedna_tabela = pd.DataFrame()
@@ -333,7 +333,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
 if __name__ == '__main__':
     config_func_unet3(server=False)
     # lr = [1e-2,1e-3,1e-4]
-    lr = [1e-3] 
+    lr = [1e-3]
     lambda_parametar = [1]
     stepovi_arr = [5]
     num_epochs = [10]
@@ -349,13 +349,13 @@ if __name__ == '__main__':
                 for lr_index in range(len(lr)): # petlja kojom ispitujemo kako se trening menja za razlicite lr-ove
                     for num_of_epochs_index in range(len(num_epochs)):
                         for loss_type_index in range(len(loss_type)):
-                            for Batch_size_index in range(len(Batch_size)): 
+                            for Batch_size_index in range(len(Batch_size)):
                                 main(r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/leave_one_out/Experiment5/trening_set_masked/img",
                                 r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/leave_one_out/Experiment5/validation_set/img",
                                 r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/leave_one_out/Experiment5/test_set/img",
                                 p_index,lr[lr_index],lambda_parametar[lambd_index],stepovi_arr[step_index], num_epochs[num_of_epochs_index],
                                 loss_type[loss_type_index],Batch_size[Batch_size_index])
         # uporedna_tabela['TestSet IoU Metric '+str(p_index)] = IOU
-        
-    # uporedna_tabela = uporedna_tabela.set_axis(classes_labels2).T                
+
+    # uporedna_tabela = uporedna_tabela.set_axis(classes_labels2).T
     # uporedna_tabela.to_csv("Weighted BCE without background class, mini dataset, BGFG lr 1e-3 1 epochs.csv")
