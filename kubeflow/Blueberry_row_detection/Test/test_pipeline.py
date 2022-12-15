@@ -47,7 +47,7 @@ def load_checkpoint(checkpoint,model):
 
             for key in new_checkpoint:
                 print(key)
-            
+
             model.load_state_dict(new_checkpoint)
 
 
@@ -62,7 +62,7 @@ def augmentation_and_saving(img,label,path_img,path_label,testing_flag = True,pn
         index = -19
     elif len(path_img.split()[-1].split("_")[-1]) > 2 :
         index = -20
-    
+
     if png_flag:
         plt.imsave(path_label[:index]+'label_' +path_label[index:] + '.png', label)
         plt.imsave(path_img + '.png', img[:,:,:3])
@@ -70,14 +70,14 @@ def augmentation_and_saving(img,label,path_img,path_label,testing_flag = True,pn
         np.save(path_label[:index]+'label_' +path_label[index:] + '.npy', label)
         np.save(path_img + '.npy', img)
     if testing_flag == False:
-        
+
         rot1_label = np.rot90(label)
         rot2_label = np.rot90(rot1_label)
         rot3_label = np.rot90(rot2_label)
         rot1_img = np.rot90(img)
         rot2_img = np.rot90(rot1_img)
         rot3_img = np.rot90(rot2_img)
-        
+
 
         if png_flag:
             plt.imsave(path_label[:index]+'label_' +path_label[index:] + '_rot90' + '.png', rot1_label)
@@ -95,15 +95,15 @@ def augmentation_and_saving(img,label,path_img,path_label,testing_flag = True,pn
             np.save(path_img + '_rot270' + '.npy', rot3_img)
         label = cv.flip(label,flipCode=1)
         img = cv.flip(img,flipCode=1)
-        
+
         rot1_label = np.rot90(label)
         rot2_label = np.rot90(rot1_label)
         rot3_label = np.rot90(rot2_label)
         rot1_img = np.rot90(img)
         rot2_img = np.rot90(rot1_img)
         rot3_img = np.rot90(rot2_img)
-        
-        
+
+
         if png_flag:
             plt.imsave(path_label[:index]+'label_' +path_label[index:]+ '_fliped.png', label)
             plt.imsave(path_img + '_fliped.png', img[:, :, :3])
@@ -122,14 +122,14 @@ def augmentation_and_saving(img,label,path_img,path_label,testing_flag = True,pn
             np.save(path_img + '_rot90_fliped' + '.npy', rot1_img)
             np.save(path_img + '_rot180_fliped' + '.npy', rot2_img)
             np.save(path_img + '_rot270_fliped' + '.npy', rot3_img)
-            
+
 
 
 
 def preprocessing_block(GeoTiff,Shape,save_data_pth):
     print("Preprocessing block started")
     print("Dividing test parcel to 512x512 patches")
-    
+
     H = np.shape(GeoTiff[:,:,0])[0]
     W = np.shape(GeoTiff[:,:,0])[1]
     patch_size = 512
@@ -138,15 +138,15 @@ def preprocessing_block(GeoTiff,Shape,save_data_pth):
     tmp_nir = np.zeros([patch_size,patch_size])
     tmp_red_edge = np.zeros([patch_size,patch_size])
     tmp_svi_kanali_combo = np.zeros([patch_size,patch_size])
-    
+
     testing_flag = True
     counter = 0
     for i in range(H//patch_size):
-        
+
         for j in range(W//patch_size):
-            
+
             tmp_labels = Shape[i*patch_size:i*patch_size+patch_size,j*patch_size:j*patch_size+patch_size]
-                
+
             tmp_rgb = GeoTiff[i*patch_size:i*patch_size+patch_size,j*patch_size:j*patch_size+patch_size,:3]
             tmp_nir = GeoTiff[i * patch_size:i * patch_size + patch_size, j * patch_size:j * patch_size + patch_size,3]
             tmp_nir = np.expand_dims(tmp_nir, axis=2)
@@ -155,7 +155,7 @@ def preprocessing_block(GeoTiff,Shape,save_data_pth):
             tmp_svi_kanali_combo = np.concatenate([tmp_rgb,tmp_nir,tmp_red_edge],axis=2)
             png_flag = False
             if np.sum(tmp_labels)!= 0:
-                
+
                 if png_flag:
                     path_img = save_data_pth + '/img/svi_kanali_combo_' + str(counter)
                     path_label = save_data_pth + '/label/svi_kanali_combo_' + str(counter)
@@ -218,15 +218,15 @@ def postprocessing_block(GeoTiff,y0,y1,x0,x1,final_mask, geotransform, projectio
     samples = sorted(samples, key=lambda s: int(re.search(r'\d+', s).group()))
     counter = 0
     for i in range(H//patch_size):
-        
+
         for j in range(W//patch_size):
-            
+
             tmp_labels = GeoTiff[i*patch_size:i*patch_size+patch_size,j*patch_size:j*patch_size+patch_size,5]
-                
-            
+
+
             png_flag = False
             if np.sum(tmp_labels)!= 0:
-                
+
                 Final_prediction[i*patch_size:i*patch_size+patch_size,j*patch_size:j*patch_size+patch_size] = np.load(load_pred_pth+'/'+samples[counter])
 
                 print('Final test sample '+str(counter))
@@ -259,9 +259,9 @@ def postprocessing_block(GeoTiff,y0,y1,x0,x1,final_mask, geotransform, projectio
 
 
 def main(input_files_type=None):
-    
+
     # Loading test rasters
-    
+
     if input_files_type == "npy":
         in_test_raster_r = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/kanali npy/test_ch_red_croped.npy"
         in_test_raster_g = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/kanali npy/test_ch_green_croped.npy"
@@ -274,7 +274,7 @@ def main(input_files_type=None):
         ch_blue = np.load(in_test_raster_b)
         ch_nir = np.load(in_test_raster_nir)
         ch_rededge = np.load(in_test_raster_rededge)
-    
+
     else:
         in_raster_r = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_red.tif"
         in_raster_g = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_green.tif"
@@ -354,9 +354,9 @@ def main(input_files_type=None):
                 final_final_pts = np.concatenate([np.reshape(final_final_pts,[0,2]),final_pts[i]])
             else:
                 final_final_pts = np.concatenate([final_final_pts, final_pts[i]])
-        
+
         final_mask[final_mask==2] = 0
-    
+
         x0, y0 = np.min(final_final_pts, axis=0)
         x1, y1 = np.max(final_final_pts, axis=0) + 1  # slices are exclusive at the top
         x0 = np.array(x0, 'int')
@@ -370,12 +370,14 @@ def main(input_files_type=None):
 
         if (SHRT_MAX < diag_len):
             raise Exception ("Image size exceeds allow size !!!")
-        
+
         ch_red = ch_red[y0:y1,x0:x1]*cropped_mask
         ch_green = ch_green[y0:y1,x0:x1]*cropped_mask
         ch_blue = ch_blue[y0:y1,x0:x1]*cropped_mask
         ch_rededge = ch_rededge[y0:y1,x0:x1]*cropped_mask
         ch_nir = ch_nir[y0:y1,x0:x1]*cropped_mask
+
+    #ovo je kraj if else
 
     ch_red = (ch_red - np.min(ch_red)) / (np.max(ch_red) - np.min(ch_red))*255
     ch_green = (ch_green - np.min(ch_green)) / (np.max(ch_green) - np.min(ch_green))*255
@@ -386,16 +388,16 @@ def main(input_files_type=None):
     save_test_data_pth = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/test_data_folder"
     # border_shp = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/shp/test_parcela_shape.shp'
     preprocessing_block(stacked_geotiffs_npy, cropped_mask, save_test_data_pth)
-    
-    
+
+
     load_test_data_pth = copy.deepcopy(save_test_data_pth+"/img")
     save_pred_data_pth = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/test_pred_folder"
-    model_pth = r"/home/stefanovicd/DeepSleep/agrovision/BorovniceUnetBS/logs/Train_BGFG_BCE_with_weights/0_13_11_2022_01_36_47_lr_1e-05_step_na_5_epoha_lambda_parametar_1_batch_size_4_sched_multiplicative_loss_bce/NN_model_ep_40_Train_BGFG_BCE_with_weights/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt" 
-    
+    model_pth = r"/home/stefanovicd/DeepSleep/agrovision/BorovniceUnetBS/logs/Train_BGFG_BCE_with_weights/0_13_11_2022_01_36_47_lr_1e-05_step_na_5_epoha_lambda_parametar_1_batch_size_4_sched_multiplicative_loss_bce/NN_model_ep_40_Train_BGFG_BCE_with_weights/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt"
+
     test_block(load_test_data_pth,model_pth,save_pred_data_pth)
-    
+
     load_pred_data_pth = copy.deepcopy(save_pred_data_pth)
-    
+
     save_final_GeoTiff_pth = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/final_results_folder'
     save_final_colored_GeoTiff_pth = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/final_results_folder'
     save_final_shp_pth = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/final_results_folder'
@@ -405,6 +407,3 @@ def main(input_files_type=None):
 
 if __name__ == '__main__':
     main()
-    
-
-
