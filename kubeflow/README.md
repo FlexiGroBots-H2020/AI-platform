@@ -397,11 +397,11 @@ kubectl apply -f envoyfilter.yaml
 
 - Create a secret with TLS certificate and key for the ingress gateway:
 
-```bash
-kubectl create -n istio-system secret tls kubeflow-domain-man-cert \
-  --key=<PATH_TO_CERTS>.key \
-  --cert=<PATH_TO_CERTS>.crt
-```
+  ```bash
+  kubectl create -n istio-system secret tls kubeflow-domain-man-cert \
+    --key=<PATH_TO_CERTS>.key \
+    --cert=<PATH_TO_CERTS>.crt
+  ```
 
 - Apply the new configuration for Istio Ingress-Gateway:
 
