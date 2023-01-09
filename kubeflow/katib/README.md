@@ -17,7 +17,7 @@ kubectl apply -k "github.com/kubeflow/katib.git/manifests/v1beta1/installs/katib
 
 This command will deploy the main Katib components:
 
-- `katib-controller`: it manages Kubernetes CRDs.
+- `katib-controller`: manages Kubernetes CRDs.
 - `katib-ui`: the user interface.
 - `katib-mysql`: the GRPC API server to control DB interface.
 - `katib-db-manager`: the DB backend to store experiment metrics.
@@ -86,8 +86,8 @@ The *configuration spec* includes the main parameters of the experiment.
   - `algorithmSettings`. Possible values: *min_trials_required* and *start_step*.
 
   More information about early stopping is available [in this site](https://www.kubeflow.org/docs/components/katib/early-stopping/), and a YAML configuration file which uses this method can be found [here](https://github.com/kubeflow/katib/blob/master/examples/v1beta1/early-stopping/median-stop.yaml).
-- `trialTemplate`: (...)
-- `metricsCollectorSpec`. This field indicates how to collect the metrics from each trial (accuracy, loss, etc.), which can be recorded into *StdOut*, or into output files. The metrics are collected using a sidecar container.  (...)
+- `trialTemplate`: the template that defines the trial. [More info](https://www.kubeflow.org/docs/components/katib/trial-template/#custom-resource).
+- `metricsCollectorSpec`. This field indicates how to collect the metrics from each trial (accuracy, loss, etc.), which can be recorded into *StdOut*, or into output files. [More info](https://www.kubeflow.org/docs/components/katib/experiment/#metrics-collector).
 - `resumePolicy`. Possible values: *LongRunning* (by default), *Never* or *FromVolume*. Depending on the chosen one, we will be able to restart the experiment or not, and the Deployment and Service will be deleted or will continue running. More info about resuming an experiment can be found in [the documentation](https://www.kubeflow.org/docs/components/katib/resume-experiment/#resume-succeeded-experiment).
 
 ### 3. Experiment Running
@@ -156,7 +156,7 @@ To launch the experiment, you must clone the repository and execute the followin
 kubectl apply -f ./examples/mxnet-mnist.yaml
 ```
 
-### REALISED example (acoustic dataset)
+### ReaLISED example (acoustic dataset)
 
 In the *mxnet-realised-dataset.yaml* example, sound event classification tasks are tested in the [ReaLISED dataset](https://zenodo.org/record/6488321#.Y7wfK_6ZOUl), trying to classify up to 18 different acoustic sources. In this case, the Docker image is hosted in a [personal repository](https://hub.docker.com/repository/docker/joaquingarciaatos/mxnet-audio-dataset/), where the full dataset as well as the code is available. The machine learning library used is Apache MXNet, as in the previous example. In this case Mel-Spectrogram features are extracted to convert the acoustic raw files into images.
 
