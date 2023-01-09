@@ -112,7 +112,8 @@ The experiment submission can also be done in the Katib UI, as described [here](
 
 The Katib User Interface (UI) can be accessed opening the Kubeflow UI and clicking *Experiments (AutoML)* in the left-hand menu.
 
-![Kubefow Details](/figures/kubeflow_details.jpeg?raw=true "Kubefow Details Tab")
+![Kubefow Details](./figures/kubeflow_details.jpeg "Title")
+*Kubeflow Details*
 
 
 ## References
