@@ -26,6 +26,9 @@ import time
 import numpy as np
 import time
 import matplotlib.pyplot as plt
+import argparse
+import time
+from pathlib import Path
 
 import cv2
 
@@ -249,7 +252,7 @@ def postprocessing_block(GeoTiff,y0,y1,x0,x1,final_mask, geotransform, projectio
     final_mask[y0:y1,x0:x1] = copy.deepcopy(Final_prediction)
     # final_mask[y0 - row_pad:y_end + row_pad, x_start - column_pad:x_end + column_pad] = copy.deepcopy(image)
     driver = gdal.GetDriverByName('GTiff')
-    tmp_raster = driver.Create('test_parcel.tif', final_mask.shape[1], final_mask.shape[0], 1, gdal.GDT_Byte)
+    tmp_raster = driver.Create(save_final_GeoTiff_pth + '/' + 'test_parcel.tif', final_mask.shape[1], final_mask.shape[0], 1, gdal.GDT_Byte)
     tmp_raster.SetGeoTransform(geotransform)
     tmp_raster.SetProjection(projection)
     srcband = tmp_raster.GetRasterBand(1)
@@ -410,6 +413,22 @@ def main(input_files_type=None):
 
 
 if __name__ == '__main__':
-    print("START")
+    print("START Test component")
     main()
     print("END")
+    print(" output file")
+
+    print("pravim parser")
+    parser = argparse.ArgumentParser(description='My program description')
+    print("dodajem arg1")
+    parser.add_argument('--new_location', type=str)
+    print("dodajem arg2")
+    parser.add_argument('--output1-path', type=str, help='Path of the local file where the Output 1 data should be written.')
+    print('1')
+    args = parser.parse_args()
+    print('2')
+    print("uspelo parsiranje")
+    Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
+    print('3')
+    with open(args.output1_path, 'w') as output1_file:
+        _ = output1_file.write("empty_cache")
