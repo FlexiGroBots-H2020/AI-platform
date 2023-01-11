@@ -1,3 +1,4 @@
+from osgeo import gdal,ogr,osr
 from calendar import EPOCH
 from signal import pthread_sigmask
 from typing import Final
@@ -5,7 +6,6 @@ from unittest.mock import patch
 import matplotlib.pyplot as plt
 from numpy import binary_repr
 import torch.utils.data.dataloader
-from osgeo import gdal,ogr,osr
 import torch
 from torch.utils.tensorboard import SummaryWriter
 import random
@@ -257,18 +257,22 @@ def postprocessing_block(GeoTiff,y0,y1,x0,x1,final_mask, geotransform, projectio
     srcband.FlushCache()
     print("Postprocessing block ended")
 
+def new_print_function(a):
+    print(a)
 
 def main(input_files_type=None):
-
+    new_print_function("main metod")
     # Loading test rasters
+    #main_path = "/home/tloken/biosens/borovnice"
+    main_path = "/mnt"
+    border_shp = main_path + "/DataTest/shp/test_parcela_shape.shp"
 
     if input_files_type == "npy":
-        in_test_raster_r = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/kanali npy/test_ch_red_croped.npy"
-        in_test_raster_g = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/kanali npy/test_ch_green_croped.npy"
-        in_test_raster_b = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/kanali npy/test_ch_blue_croped.npy"
-        in_test_raster_rededge = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/kanali npy/test_ch_red_edge_croped.npy"
-        in_test_raster_nir = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/kanali npy/test_ch_nir_croped.npy"
-        border_shp = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/shp/test_parcela_shape.shp'
+        in_test_raster_r = main_path + "/DataTest/kanali_npy/test_ch_red_croped.npy"
+        in_test_raster_g = main_path + "/DataTest/kanali_npy/test_ch_green_croped.npy"
+        in_test_raster_b = main_path + "/DataTest/kanali_npy/test_ch_blue_croped.npy"
+        in_test_raster_rededge = main_path + "/DataTest/kanali_npy/test_ch_red_edge_croped.npy"
+        in_test_raster_nir = main_path + "/DataTest/kanali_npy/test_ch_nir_croped.npy"
         ch_red = np.load(in_test_raster_r)
         ch_green = np.load(in_test_raster_g)
         ch_blue = np.load(in_test_raster_b)
@@ -276,12 +280,11 @@ def main(input_files_type=None):
         ch_rededge = np.load(in_test_raster_rededge)
 
     else:
-        in_raster_r = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_red.tif"
-        in_raster_g = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_green.tif"
-        in_raster_b = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_blue.tif"
-        in_raster_rededge = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_red edge.tif"
-        in_raster_nir = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_nir.tif"
-        border_shp = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/shp/test_parcela_shape.shp'
+        in_raster_r = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_red.tif"
+        in_raster_g = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_green.tif"
+        in_raster_b = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_blue.tif"
+        in_raster_rededge = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_red edge.tif"
+        in_raster_nir = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_nir.tif"
         r = gdal.Open(in_raster_r)
         g = gdal.Open(in_raster_g)
         b = gdal.Open(in_raster_b)
@@ -385,26 +388,28 @@ def main(input_files_type=None):
     ch_nir = (ch_nir - np.min(ch_nir)) / (np.max(ch_nir) - np.min(ch_nir))*255
     ch_rededge = (ch_rededge - np.min(ch_rededge)) / (np.max(ch_rededge) - np.min(ch_rededge))*255
     stacked_geotiffs_npy = np.stack([ch_red,ch_green,ch_blue,ch_rededge,ch_nir,cropped_mask],axis = 2)
-    save_test_data_pth = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/test_data_folder"
+    save_test_data_pth = main_path + "/DataTest/test_data_folder"
     # border_shp = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/shp/test_parcela_shape.shp'
     preprocessing_block(stacked_geotiffs_npy, cropped_mask, save_test_data_pth)
 
 
-    save_test_data_pth = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/test_data_folder"
+    save_test_data_pth = main_path + "/DataTest/test_data_folder"
     load_test_data_pth = copy.deepcopy(save_test_data_pth+"/img")
-    save_pred_data_pth = r"/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/test_pred_folder"
-    model_pth = r"/home/stefanovicd/DeepSleep/agrovision/BorovniceUnetBS/logs/Train_BGFG_BCE_with_weights/0_13_11_2022_01_36_47_lr_1e-05_step_na_5_epoha_lambda_parametar_1_batch_size_4_sched_multiplicative_loss_bce/NN_model_ep_40_Train_BGFG_BCE_with_weights/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt"
+    save_pred_data_pth = main_path + "/DataTest/test_pred_folder"
+    model_pth = main_path + "/DataTest/logs/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt"
 
     test_block(load_test_data_pth,model_pth,save_pred_data_pth)
 
     load_pred_data_pth = copy.deepcopy(save_pred_data_pth)
 
-    save_final_GeoTiff_pth = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/final_results_folder'
-    save_final_colored_GeoTiff_pth = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/final_results_folder'
-    save_final_shp_pth = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/final_results_folder'
+    save_final_GeoTiff_pth = main_path + "/DataTest/final_results_folder"
+    save_final_colored_GeoTiff_pth = main_path + "/DataTest/final_results_folder"
+    save_final_shp_pth = main_path + "/DataTest/final_results_folder"
     postprocessing_block(stacked_geotiffs_npy,y0,y1,x0,x1,final_mask, geo_transform,wkt_raster_proj,load_pred_data_pth, save_final_GeoTiff_pth, save_final_colored_GeoTiff_pth, save_final_shp_pth)
 
 
 
 if __name__ == '__main__':
+    print("START")
     main()
+    print("END")

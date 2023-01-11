@@ -1,0 +1,5 @@
+opencv-python
+segmentation_models_pytorch
+pandas
+scikit-learn
+seaborn

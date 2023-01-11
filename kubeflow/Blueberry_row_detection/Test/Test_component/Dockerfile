@@ -1,15 +1,36 @@
-FROM python:3.8
+FROM continuumio/miniconda3
 WORKDIR /pipelines
 COPY requirements.txt /pipelines
+
+# Make RUN commands use `bash --login`:
+SHELL ["/bin/bash", "--login", "-c"]
+
+COPY environment.yml .
+
+RUN pip install -r requirements.txt
+
+
 
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6  -y
 
 
-RUN pip install -r requirements.txt
+RUN conda env create -f environment.yml
+
+# Initialize conda in bash config fiiles:
+RUN conda init bash
+
+RUN conda activate myenv
+
+RUN conda install gdal
+
+RUN conda install pytorch torchvision torchaudio cudatoolkit matplotlib tensorboard -c pytorch
+
+
+
 COPY . /pipelines
 
-RUN chmod +x /pipelines/Train_BGFG_BCE_with_weightsUnet3.py
+RUN chmod +x /pipelines/test_pipeline.py
 
 ENTRYPOINT ["python"]
-CMD ["/pipelines/Train_BGFG_BCE_with_weightsUnet3.py"]
+CMD ["/pipelines/test_pipeline.py"]
