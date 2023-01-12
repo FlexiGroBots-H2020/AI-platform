@@ -22,8 +22,6 @@
         storageUri: "gs://kfserving-examples/models/tensorflow/flowers"
     ```
 
-
-
 - In the current instance of Kubeflow, the default ```InferenceService``` URLs
   are not accessible from outside de K8s cluster. Therefore, it is required to retrieve
   the valid endpoint for the ```InferenceService``` you have just deployed:
@@ -55,3 +53,7 @@
         ]
     }
     ```
+
+## Custom inference services
+
+Please refer to ```custom_model_backbone``` example and its documentation.
