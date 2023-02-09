@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: blueberry-detection-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.14, pipelines.kubeflow.org/pipeline_compilation_time: '2022-11-23T01:02:40.565515',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "blueberry detection pipeline",
+      "inputs": [{"default": "2Gi", "name": "size", "optional": true, "type": "String"}],
+      "name": "blueberry detection"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.14}
+spec:
+  entrypoint: blueberry-detection
+  templates:
+  - name: blueberry-detection
+    dag:
+      tasks:
+      - {name: postprocessing, template: postprocessing}
+  - name: postprocessing
+    container:
+      args: []
+      command: [python, PostProcessing.py]
+      image: ghcr.io/flexigrobots-h2020/borovnice_postprocessing:latest
+      volumeMounts:
+      - {mountPath: /mnt, name: biosens-agrovision-data-volume}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.14
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+      annotations: {pipelines.kubeflow.org/component_spec: '{"description": "PostProcessing
+          results", "implementation": {"container": {"command": ["python", "PostProcessing.py"],
+          "image": "ghcr.io/flexigrobots-h2020/borovnice_postprocessing:latest"}},
+          "name": "PostProcessing"}', pipelines.kubeflow.org/component_ref: '{"digest":
+          "8d44290f99862adcfe91ecd33c6b0d634633a142f897e22c550039249555b022", "url":
+          "postprocessing/postprocessing_model.yaml"}'}
+    volumes:
+    - name: biosens-agrovision-data-volume
+      persistentVolumeClaim: {claimName: biosens-agrovision-data-volume}
+  arguments:
+    parameters:
+    - {name: size, value: 2Gi}
+  serviceAccountName: pipeline-runner

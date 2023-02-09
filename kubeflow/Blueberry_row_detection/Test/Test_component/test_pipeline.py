@@ -206,9 +206,10 @@ def test_block(load_data_pth,model_pth,save_pred_pth):
         img = np.load(load_data_pth + "/" + sample)
         img = torch.tensor(img).permute(2,0,1).unsqueeze(0)
         pred_sample = segmentation_net(img.float()/255)
+        print("unique values of input: ",np.unique(img.float()/255))
         sigmoid_func = torch.nn.Sigmoid()
         preds_sample2 = sigmoid_func(pred_sample)
-        pred_sample_bin = (preds_sample2 > 0.5).byte()
+        pred_sample_bin = (preds_sample2 > 0.2).byte()
 
         # plt.imsave(save_pred_pth+"/pred_"+sample[:-4]+'.png',pred_sample_bin.cpu().detach().numpy()[0][0])
         np.save(save_pred_pth+"/pred_"+sample,pred_sample_bin.cpu().detach().numpy()[0][0])
@@ -276,7 +277,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
 
     # final_mask[y0 - row_pad:y_end + row_pad, x_start - column_pad:x_end + column_pad] = copy.deepcopy(image)
     driver = gdal.GetDriverByName('GTiff')
-    tmp_raster = driver.Create(os.path.join(save_final_GeoTiff_pth,'unetpp_test_parcel.tif'), final_mask.shape[1], final_mask.shape[0], 1, gdal.GDT_Byte)
+    tmp_raster = driver.Create(os.path.join(save_final_GeoTiff_pth,'unetpp_test_parcel_belanovica.tif'), final_mask.shape[1], final_mask.shape[0], 1, gdal.GDT_Byte)
     tmp_raster.SetGeoTransform(geotransform)
     tmp_raster.SetProjection(projection)
     srcband = tmp_raster.GetRasterBand(1)
@@ -285,7 +286,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
     print("Postprocessing block ended")
 
     
-    geotiffff = gdal.GetDriverByName('GTiff').Create(os.path.join(save_final_colored_GeoTiff_pth,'rgb_masked_with_red.tif'),final_mask.shape[1], final_mask.shape[0], 3, gdal.GDT_Byte)
+    geotiffff = gdal.GetDriverByName('GTiff').Create(os.path.join(save_final_colored_GeoTiff_pth,'rgb_masked_with_red_belanovica.tif'),final_mask.shape[1], final_mask.shape[0], 3, gdal.GDT_Byte)
 
     geotiffff.SetGeoTransform(geotransform)    # specify coords
     srs = osr.SpatialReference()            # establish encoding
@@ -304,7 +305,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
     for i in range(len(ind_list)):
         geometries.append(ogr.Geometry(ogr.wkbMultiPolygon))
 
-    outShapefile = os.path.join(save_final_shp_pth,"unetpp_test_parcel_tmp.shp")
+    outShapefile = os.path.join(save_final_shp_pth,"unetpp_test_parcel_tmp_belanovica.shp")
     outDriver = ogr.GetDriverByName('ESRI Shapefile')
     if os.path.exists(outShapefile):
         outDriver.DeleteDataSource(outShapefile)
@@ -334,7 +335,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
         union.append(geometries[i].UnionCascaded())
         print(geometries[i].UnionCascaded())
 
-    outShapefile_new = os.path.join(save_final_shp_pth,"unetpp_test_parcel.shp")
+    outShapefile_new = os.path.join(save_final_shp_pth,"unetpp_test_parcel_belanovica.shp")
     outDriver_new = ogr.GetDriverByName('ESRI Shapefile')
     if os.path.exists(outShapefile_new):
         outDriver_new.DeleteDataSource(outShapefile_new)
@@ -549,12 +550,18 @@ def main(input_files_type=None):
     stacked_geotiffs_npy = np.stack([ch_red_cropped,ch_green_cropped,ch_blue_cropped,ch_rededge_cropped,ch_nir_cropped,cropped_mask],axis = 2)
     full_stacked_geotiffs = np.stack([ch_red,ch_green,ch_blue],axis = 2)
     save_test_data_pth = main_path + "/DataTest/test_data_folder"
+    if os.path.isdir(save_test_data_pth)==False:
+        os.mkdir(save_test_data_pth)
+        os.mkdir(os.path.join(save_test_data_pth,"img"))
+        os.mkdir(os.path.join(save_test_data_pth,"label"))
     # border_shp = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/shp/test_parcela_shape.shp'
     preprocessing_block(stacked_geotiffs_npy, cropped_mask, save_test_data_pth)
 
     
     load_test_data_pth = copy.deepcopy(save_test_data_pth+"/img")
     save_pred_data_pth = main_path + "/DataTest/test_pred_folder"
+    if os.path.isdir(save_pred_data_pth)==False:
+        os.mkdir(save_pred_data_pth)
     model_pth = main_path + "/DataTest/logs/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt"
 
     test_block(load_test_data_pth,model_pth,save_pred_data_pth)
@@ -562,6 +569,8 @@ def main(input_files_type=None):
     load_pred_data_pth = copy.deepcopy(save_pred_data_pth)
 
     save_final_GeoTiff_pth = main_path + "/DataTest/final_results_folder"
+    if os.path.isdir(save_final_GeoTiff_pth)==False:
+        os.mkdir(save_final_GeoTiff_pth)
     save_final_colored_GeoTiff_pth = main_path + "/DataTest/final_results_folder"
     save_final_shp_pth = main_path + "/DataTest/final_results_folder"
     postprocessing_block(stacked_geotiffs_npy,full_stacked_geotiffs,y0,y1,x0,x1,final_mask, geo_transform,wkt_raster_proj,load_pred_data_pth, save_final_GeoTiff_pth, save_final_colored_GeoTiff_pth, save_final_shp_pth)

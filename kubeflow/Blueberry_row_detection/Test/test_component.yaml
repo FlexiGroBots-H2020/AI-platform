@@ -1,0 +1,21 @@
+name: Full Test Component
+description: Full Test Component
+
+inputs:
+- {name: new_location, type: list, description: 'test_location'}
+
+outputs:
+- {name: output1-path, type: list, description: 'output'}
+
+implementation:
+  container:
+    image: ghcr.io/flexigrobots-h2020/test_full_test_component:latest
+    command: [
+      python, test_pipeline.py,
+      
+      --new_location,
+      {inputValue: new_location},
+      
+      --output1-path, 
+      {outputPath: output1-path},
+    ]
