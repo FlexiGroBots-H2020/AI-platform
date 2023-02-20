@@ -1,0 +1,70 @@
+metadata:
+  name: katib-pytorch-mnist
+  namespace: lazarlemic2
+spec:
+  parameters:
+    - name: lr
+      parameterType: double
+      feasibleSpace:
+        max: '0.05'
+        min: '0.01'
+    - name: momentum
+      parameterType: double
+      feasibleSpace:
+        max: '0.7'
+        min: '0.3'
+  objective:
+    type: maximize
+    goal: 0.99
+    objectiveMetricName: accuracy
+    metricStrategies:
+      - name: accuracy
+        value: max
+  algorithm:
+    algorithmName: random
+  trialTemplate:
+    trialSpec:
+      apiVersion: batch/v1
+      kind: Job
+      spec:
+        template:
+          metadata:
+            annotations:
+              sidecar.istio.io/inject: 'false'
+          spec:
+            containers:
+              - command:
+                  - python3
+                  - mnist.py
+                  - '--epochs=1'
+                  - '--log-path=/katib/mnist.log'
+                  - '--lr=${trialParameters.learningRate}'
+                  - '--momentum=${trialParameters.momentum}'
+                image: ghcr.io/flexigrobots-h2020/torchtesting2:latest
+                name: training-container
+            restartPolicy: Never
+    trialParameters:
+      - name: learningRate
+        description: Learning rate for the training model
+        reference: lr
+      - name: momentum
+        description: Momentum for the training model
+        reference: momentum
+    primaryContainerName: training-container
+    successCondition: status.conditions.#(type=="Complete")#|#(status=="True")#
+    failureCondition: status.conditions.#(type=="Failed")#|#(status=="True")#
+  parallelTrialCount: 2
+  maxTrialCount: 5
+  maxFailedTrialCount: 3
+  metricsCollectorSpec:
+    source:
+      fileSystemPath:
+        path: /katib/mnist.log
+        kind: File
+        format: TEXT
+      filter:
+        metricsFormat:
+          - '{metricName: ([\w|-]+), metricValue: ((-?\d+)(\.\d+)?)}'
+    collector:
+      kind: File
+  resumePolicy: LongRunning
