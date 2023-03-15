@@ -1,0 +1,218 @@
+python Train_BGFG_BCE_with_weightsUnet3.py --learning_rate 0.1 --num_epochs 10 --trening_location C:/Users/daniv/Downloads/FullSet/trening_set_mini2/img --validation_location C:/Users/daniv/Downloads/FullSet/validation_set_mini2/img --test_location C:/Users/daniv/Downloads/FullSet/test_set_mini2/img --new_location logs.txt
+
+2023-03-03T11:12:15Z INFO     {metricName: loss, metricValue: 0.6874}
+
+2023-03-03T11:12:29Z INFO     {metricName: loss, metricValue: 0.6774}
+
+2023-03-03T11:12:45Z INFO     {metricName: loss, metricValue: 0.6568}
+
+2023-03-03T11:13:00Z INFO     {metricName: loss, metricValue: 0.6357}
+
+2023-03-03T11:13:15Z INFO     {metricName: loss, metricValue: 0.6276}
+
+2023-03-03T11:13:29Z INFO     {metricName: loss, metricValue: 0.6296}
+
+2023-03-03T11:13:44Z INFO     {metricName: loss, metricValue: 0.6367}
+
+2023-03-03T11:13:59Z INFO     {metricName: loss, metricValue: 0.6458}
+
+2023-03-03T11:14:14Z INFO     {metricName: loss, metricValue: 0.6501}
+
+2023-03-03T11:14:29Z INFO     {metricName: loss, metricValue: 0.6557}
+
+2023-03-03T11:14:44Z INFO     {metricName: loss, metricValue: 0.6552}
+
+2023-03-03T11:14:59Z INFO     {metricName: loss, metricValue: 0.6460}
+
+2023-03-03T11:15:14Z INFO     {metricName: loss, metricValue: 0.6319}
+
+2023-03-03T11:15:29Z INFO     {metricName: loss, metricValue: 0.6210}
+
+2023-03-03T11:15:44Z INFO     {metricName: loss, metricValue: 0.6090}
+
+2023-03-03T11:15:59Z INFO     {metricName: loss, metricValue: 0.5993}
+
+2023-03-03T11:16:14Z INFO     {metricName: loss, metricValue: 0.5852}
+
+2023-03-03T11:16:29Z INFO     {metricName: loss, metricValue: 0.5757}
+
+2023-03-03T11:16:44Z INFO     {metricName: loss, metricValue: 0.5648}
+
+2023-03-03T11:16:58Z INFO     {metricName: loss, metricValue: 0.5563}
+
+2023-03-03T11:38:29Z INFO     {metricName: loss, metricValue: 0.6905}
+
+2023-03-03T11:38:45Z INFO     {metricName: loss, metricValue: 0.6729}
+
+2023-03-03T11:39:00Z INFO     {metricName: loss, metricValue: 0.6404}
+
+2023-03-03T11:39:15Z INFO     {metricName: loss, metricValue: 0.6255}
+
+2023-03-03T11:39:30Z INFO     {metricName: loss, metricValue: 0.6245}
+
+2023-03-03T11:39:45Z INFO     {metricName: loss, metricValue: 0.6279}
+
+2023-03-03T11:40:00Z INFO     {metricName: loss, metricValue: 0.6396}
+
+2023-03-03T11:40:15Z INFO     {metricName: loss, metricValue: 0.6478}
+
+2023-03-03T11:40:30Z INFO     {metricName: loss, metricValue: 0.6593}
+
+2023-03-03T11:40:45Z INFO     {metricName: loss, metricValue: 0.6696}
+
+2023-03-03T11:41:00Z INFO     {metricName: loss, metricValue: 0.6684}
+
+2023-03-03T11:41:15Z INFO     {metricName: loss, metricValue: 0.6666}
+
+2023-03-03T11:41:30Z INFO     {metricName: loss, metricValue: 0.6610}
+
+2023-03-03T11:41:46Z INFO     {metricName: loss, metricValue: 0.6576}
+
+2023-03-03T11:42:01Z INFO     {metricName: loss, metricValue: 0.6527}
+
+2023-03-03T11:42:16Z INFO     {metricName: loss, metricValue: 0.6508}
+
+2023-03-03T11:42:31Z INFO     {metricName: loss, metricValue: 0.6477}
+
+2023-03-03T11:42:46Z INFO     {metricName: loss, metricValue: 0.6444}
+
+2023-03-03T11:43:01Z INFO     {metricName: loss, metricValue: 0.6380}
+
+2023-03-03T11:43:16Z INFO     {metricName: loss, metricValue: 0.6354}
+
+2023-03-03T11:43:31Z INFO     {metricName: loss, metricValue: 0.6334}
+
+2023-03-03T11:43:46Z INFO     {metricName: loss, metricValue: 0.6305}
+
+2023-03-03T11:44:01Z INFO     {metricName: loss, metricValue: 0.6307}
+
+2023-03-03T11:44:17Z INFO     {metricName: loss, metricValue: 0.6305}
+
+2023-03-03T11:44:32Z INFO     {metricName: loss, metricValue: 0.6290}
+
+2023-03-03T11:44:47Z INFO     {metricName: loss, metricValue: 0.6284}
+
+2023-03-03T11:45:02Z INFO     {metricName: loss, metricValue: 0.6267}
+
+2023-03-03T11:45:17Z INFO     {metricName: loss, metricValue: 0.6271}
+
+2023-03-03T11:45:32Z INFO     {metricName: loss, metricValue: 0.6276}
+
+2023-03-03T11:45:47Z INFO     {metricName: loss, metricValue: 0.6280}
+
+2023-03-03T11:46:02Z INFO     {metricName: loss, metricValue: 0.6304}
+
+2023-03-03T11:46:17Z INFO     {metricName: loss, metricValue: 0.6313}
+
+2023-03-03T11:46:32Z INFO     {metricName: loss, metricValue: 0.6335}
+
+2023-03-03T11:46:47Z INFO     {metricName: loss, metricValue: 0.6351}
+
+2023-03-03T11:47:02Z INFO     {metricName: loss, metricValue: 0.6352}
+
+2023-03-03T11:47:17Z INFO     {metricName: loss, metricValue: 0.6353}
+
+2023-03-03T11:47:32Z INFO     {metricName: loss, metricValue: 0.6371}
+
+2023-03-03T11:47:48Z INFO     {metricName: loss, metricValue: 0.6382}
+
+2023-03-03T11:48:03Z INFO     {metricName: loss, metricValue: 0.6408}
+
+2023-03-03T11:48:18Z INFO     {metricName: loss, metricValue: 0.6429}
+
+2023-03-03T11:53:28Z INFO     {metricName: loss, metricValue: 2.6567}
+
+2023-03-03T11:56:20Z INFO     {metricName: loss, metricValue: 3.5833}
+
+2023-03-03T11:59:13Z INFO     {metricName: loss, metricValue: 2.7690}
+
+2023-03-03T12:02:07Z INFO     {metricName: loss, metricValue: 2.3432}
+
+2023-03-03T12:04:57Z INFO     {metricName: loss, metricValue: 2.2492}
+
+2023-03-03T12:07:47Z INFO     {metricName: loss, metricValue: 2.1751}
+
+2023-03-03T12:10:39Z INFO     {metricName: loss, metricValue: 2.0486}
+
+2023-03-03T12:13:30Z INFO     {metricName: loss, metricValue: 1.8648}
+
+2023-03-03T12:16:21Z INFO     {metricName: loss, metricValue: 1.6992}
+
+2023-03-03T12:19:13Z INFO     {metricName: loss, metricValue: 1.5598}
+
+2023-03-03T12:22:04Z INFO     {metricName: loss, metricValue: 1.4441}
+
+2023-03-03T12:24:55Z INFO     {metricName: loss, metricValue: 1.3473}
+
+2023-03-03T12:27:50Z INFO     {metricName: loss, metricValue: 1.2648}
+
+2023-03-03T12:30:54Z INFO     {metricName: loss, metricValue: 1.1936}
+
+2023-03-03T12:33:56Z INFO     {metricName: loss, metricValue: 1.1317}
+
+2023-03-03T12:36:55Z INFO     {metricName: loss, metricValue: 1.0773}
+
+2023-03-03T12:39:54Z INFO     {metricName: loss, metricValue: 1.0292}
+
+2023-03-03T12:42:55Z INFO     {metricName: loss, metricValue: 0.9864}
+
+2023-03-03T12:45:57Z INFO     {metricName: loss, metricValue: 0.9483}
+
+2023-03-03T12:49:06Z INFO     {metricName: loss, metricValue: 0.9143}
+
+2023-03-03T12:52:07Z INFO     {metricName: loss, metricValue: 0.8835}
+
+2023-03-03T12:55:03Z INFO     {metricName: loss, metricValue: 0.8556}
+
+2023-03-03T12:57:59Z INFO     {metricName: loss, metricValue: 0.8301}
+
+2023-03-03T13:01:00Z INFO     {metricName: loss, metricValue: 0.8067}
+
+2023-03-03T13:04:02Z INFO     {metricName: loss, metricValue: 0.7852}
+
+2023-03-03T13:07:05Z INFO     {metricName: loss, metricValue: 0.7649}
+
+2023-03-03T13:10:11Z INFO     {metricName: loss, metricValue: 0.7465}
+
+2023-03-03T13:13:10Z INFO     {metricName: loss, metricValue: 0.7292}
+
+2023-03-03T13:16:06Z INFO     {metricName: loss, metricValue: 0.7127}
+
+2023-03-03T13:18:59Z INFO     {metricName: loss, metricValue: 0.6983}
+
+2023-03-03T13:21:56Z INFO     {metricName: loss, metricValue: 0.6838}
+
+2023-03-03T13:24:59Z INFO     {metricName: loss, metricValue: 0.6712}
+
+2023-03-03T13:27:58Z INFO     {metricName: loss, metricValue: 0.6595}
+
+2023-03-03T13:31:02Z INFO     {metricName: loss, metricValue: 0.6473}
+
+2023-03-03T13:34:18Z INFO     {metricName: loss, metricValue: 0.6373}
+
+2023-03-03T13:37:19Z INFO     {metricName: loss, metricValue: 0.6270}
+
+2023-03-03T13:40:20Z INFO     {metricName: loss, metricValue: 0.6176}
+
+2023-03-03T13:43:17Z INFO     {metricName: loss, metricValue: 0.6090}
+
+2023-03-03T13:46:18Z INFO     {metricName: loss, metricValue: 0.6018}
+
+2023-03-03T13:49:20Z INFO     {metricName: loss, metricValue: 0.5945}
+
+2023-03-03T13:56:21Z INFO     {metricName: loss, metricValue: 0.6896}
+
+2023-03-03T13:57:52Z INFO     {metricName: loss, metricValue: 0.6898}
+
+2023-03-03T14:05:40Z INFO     {metricName: loss, metricValue: 0.6850}
+
+2023-03-03T14:12:49Z INFO     {metricName: loss, metricValue: 0.6891}
+
+2023-03-03T14:18:17Z INFO     {metricName: loss, metricValue: 0.6931}
+
+2023-03-03T14:21:37Z INFO     {metricName: loss, metricValue: 6.2951}
+
+2023-03-03T14:39:54Z INFO     {metricName: loss, metricValue: 34.0344}
+
+2023-03-03T14:51:48Z INFO     {metricName: loss, metricValue: 2140111.7500}
+

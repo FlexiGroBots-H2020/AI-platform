@@ -352,6 +352,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_epochs', type=str)
     parser.add_argument('--loss_type', type=str)
     parser.add_argument('--Batch_size', type=str)
+    parser.add_argument('--net_type', type=str)
     parser.add_argument('--trening_location', type=str)
     parser.add_argument('--validation_location', type=str)
     parser.add_argument('--test_location', type=str)
@@ -359,9 +360,9 @@ if __name__ == '__main__':
     parser.add_argument('--output1-path', type=str, help='Path of the local file where the Output 1 data should be written.')
     args = parser.parse_args()
 
-    Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output1_path, 'w') as output1_file:
-        _ = output1_file.write("empty_cache")
+    # Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
+    # with open(args.output1_path, 'w') as output1_file:
+    #     _ = output1_file.write("empty_cache")
 
 
     data_location = args.new_location
