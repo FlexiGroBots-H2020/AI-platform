@@ -19,7 +19,7 @@ def pretraining_prints(p_index,lr,stepovi,lambda_parametri,batch_size,loss_type,
     today = today.replace(":", "_")
 
 
-    base_folder_path = "/mnt"
+    # base_folder_path = "/mnt"
     logs_path = base_folder_path + "/logs/"
     if not os.path.exists(logs_path):
         os.mkdir(logs_path)

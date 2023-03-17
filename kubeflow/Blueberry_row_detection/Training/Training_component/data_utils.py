@@ -19,7 +19,6 @@ def upisivanje(ispis, ime_foldera):
     fff.close()
     
 def get_args(phase,net_type):
-    
     if net_type == 'UNet3':
         if phase == 'test':
             json_path = r"config_test_Unet3.json"
@@ -30,6 +29,26 @@ def get_args(phase,net_type):
             json_path = r"config_test.json"
         else:
             json_path = r"config.json"
+    elif net_type == "SegNet":
+        if phase == 'test':
+            json_path = r"config_test.json"
+        else:
+            json_path = r"config_SegNet.json"
+    elif net_type == "PSPNet":
+        if phase == 'test':
+            json_path = r"config_test.json"
+        else:
+            json_path = r"config_PSPNet.json"
+    elif net_type == "UperNet":
+        if phase == 'test':
+            json_path = r"config_test.json"
+        else:
+            json_path = r"config_UperNet.json"
+    elif net_type == "DUC_HDCNet":
+        if phase == 'test':
+            json_path = r"config_test.json"
+        else:
+            json_path = r"config_DUCHDCNet.json"
     else:
         print('greska:')
         print(net_type)
