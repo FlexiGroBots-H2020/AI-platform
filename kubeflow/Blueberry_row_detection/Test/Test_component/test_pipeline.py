@@ -29,7 +29,10 @@ import matplotlib.pyplot as plt
 import argparse
 import time
 from pathlib import Path
-
+from SegNet import SegResNet
+from UperNet import UperNet
+from PSPNet import PSPDenseNet
+from DUC_HDCNet import DeepLab_DUC_HDC
 import cv2
 
 SHRT_MAX = 32767
@@ -187,11 +190,21 @@ def preprocessing_block(GeoTiff,Shape,save_data_pth):
     print("Preprocessing block ended")
 
 
-def test_block(load_data_pth,model_pth,save_pred_pth):
+def test_block(load_data_pth,model_pth,save_pred_pth, net_type):
     print("Test block started")
     device = 'cpu'
-    segmentation_net = smp.UnetPlusPlus(in_channels=5, encoder_depth=3, classes=1,activation=None,decoder_channels=[64, 32, 16]).to(device=device)
-    # segmentation_net = UNet3(n_channels=5, n_classes=1, height=512, width= 512, zscore = False)
+    if net_type == "UnetPlusPlus":
+        segmentation_net = smp.UnetPlusPlus(in_channels=5, encoder_depth=3, classes=1,activation=None,decoder_channels=[64, 32, 16]).to(device=device)
+    elif net_type == "SegNet":
+        segmentation_net = SegResNet(num_classes = 1, in_channels = 5, pretrained = False).to(device=device)
+    elif net_type == "PSPNet":
+        segmentation_net = PSPDenseNet(num_classes = 1, in_channels = 5, pretrained = False).to(device=device)
+    elif net_type == "UperNet":
+        segmentation_net = UperNet(num_classes = 1, in_channels = 5, pretrained = False).to(device=device)
+    elif net_type == "DUC_HDCNet":
+        segmentation_net = DeepLab_DUC_HDC(num_classes = 1, in_channels = 5, pretrained = False).to(device=device)
+    # elif net_type = "UNet3":
+    #     segmentation_net = UNet3(n_channels=5, n_classes=1, height=512, width= 512, zscore = False)
     load_checkpoint(torch.load(model_pth,map_location=torch.device('cpu')),segmentation_net)
     # segmentation_net.load_state_dict()
     # load_checkpoint(torch.load(model_pth,map_location=torch.device('cpu'))['state_dict'],segmentation_net)
@@ -415,7 +428,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
 def new_print_function(a):
     print(a)
 
-def main(input_files_type=None):
+def main(model_path, net_type, input_files_type=None):
     new_print_function("main metod")
     # Loading test rasters
     #main_path = "/home/tloken/biosens/borovnice"
@@ -562,9 +575,9 @@ def main(input_files_type=None):
     save_pred_data_pth = main_path + "/DataTest/test_pred_folder"
     if os.path.isdir(save_pred_data_pth)==False:
         os.mkdir(save_pred_data_pth)
-    model_pth = main_path + "/DataTest/logs/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt"
+    # model_pth = main_path + "/DataTest/logs/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt"
 
-    test_block(load_test_data_pth,model_pth,save_pred_data_pth)
+    test_block(load_test_data_pth,model_path,save_pred_data_pth)
 
     load_pred_data_pth = copy.deepcopy(save_pred_data_pth)
 
@@ -579,20 +592,24 @@ def main(input_files_type=None):
 
 if __name__ == '__main__':
     print("START Test component")
-    main()
     print("END")
     print(" output file")
 
     print("pravim parser")
     parser = argparse.ArgumentParser(description='My program description')
-    print("dodajem arg1")
+    print("dodajem argove")
+    parser.add_argument("--model_path", type=str)
+    parser.add_argument("--net_type", type=str)
     parser.add_argument('--new_location', type=str)
-    print("dodajem arg2")
+    print("kraj input argova")
     parser.add_argument('--output1-path', type=str, help='Path of the local file where the Output 1 data should be written.')
-    print('1')
+    print('kraj output argova')
     args = parser.parse_args()
-    print('2')
-    print("uspelo parsiranje")
+    print('kraj parsiranja')
+    print("Pokretanje Maina")
+    model_path = args.model_path
+    net_type = args.net_type
+    main(model_path = model_path, net_type = net_type)
     Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
     print('3')
     with open(args.output1_path, 'w') as output1_file:

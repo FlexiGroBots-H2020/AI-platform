@@ -31,7 +31,15 @@ def model_init(num_channels,num_channels_lab,img_h,img_w,zscore,net_type,device,
     elif net_type == "Unet_att_orig":
         segmentation_net = UNet_Attention_orig(img_ch=num_channels, output_ch=num_channels_lab, height=img_h, width=img_w,
         zscore=zscore, n1=16 )
-
+    elif net_type == "SegNet":
+        segmentation_net = SegResNet(num_classes = num_channels_lab, in_channels = num_channels)
+    elif net_type == "PSPNet":
+        segmentation_net = PSPDenseNet(num_classes = num_channels_lab, in_channels = num_channels)
+    elif net_type == "UperNet":
+        segmentation_net = UperNet(num_classes = num_channels_lab, in_channels = num_channels)
+    elif net_type == "DUC_HDCNet":
+        segmentation_net = DeepLab_DUC_HDC(num_classes = num_channels_lab, in_channels = num_channels)
+        
     segmentation_net.to(device)
     
     if server:
