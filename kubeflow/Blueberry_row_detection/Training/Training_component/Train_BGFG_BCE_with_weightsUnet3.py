@@ -323,14 +323,14 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     ### TESTING ###
     ###############
 
-    if do_testing:
-        criterion_1 = criterion
+    # if do_testing:
+    #     criterion_1 = criterion
 
-        test_loader = AgroVisionDataLoader(img_size, putanja_test, img_data_format, p_index, # umesto p_indexa shuffle parametar stoji po difoltu ,
-                                           batch_size, device, zscore,binary,dataset)
-        uporedna_tabela = pd.DataFrame()
-        IOU = run_testing(segmentation_net, test_loader, ime_foldera_za_upis, device, num_channels_lab, classes_labels,classes_labels2,
-                     criterion_1, loss_type, tb, zscore,net_type,lr,stepovi,lambda_parametri,batch_size)
+    #     test_loader = AgroVisionDataLoader(img_size, putanja_test, img_data_format, p_index, # umesto p_indexa shuffle parametar stoji po difoltu ,
+    #                                        batch_size, device, zscore,binary,dataset)
+    #     uporedna_tabela = pd.DataFrame()
+    #     IOU = run_testing(segmentation_net, test_loader, ime_foldera_za_upis, device, num_channels_lab, classes_labels,classes_labels2,
+    #                  criterion_1, loss_type, tb, zscore,net_type,lr,stepovi,lambda_parametri,batch_size)
 
     end_prints(ime_foldera_za_upis)
     # return IOU
@@ -360,9 +360,9 @@ if __name__ == '__main__':
     parser.add_argument('--output1-path', type=str, help='Path of the local file where the Output 1 data should be written.')
     args = parser.parse_args()
 
-    # Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
-    # with open(args.output1_path, 'w') as output1_file:
-    #     _ = output1_file.write("empty_cache")
+    Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
+    with open(args.output1_path, 'w') as output1_file:
+        _ = output1_file.write("empty_cache")
 
 
     data_location = args.new_location

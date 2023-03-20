@@ -5,7 +5,7 @@ torchsummary
 torch
 pandas
 seaborn
-sklearn
+scikit-learn
 torchvision
 opencv-python
 segmentation_models_pytorch
