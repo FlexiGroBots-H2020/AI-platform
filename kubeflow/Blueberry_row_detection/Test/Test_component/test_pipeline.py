@@ -577,7 +577,7 @@ def main(model_path, net_type, input_files_type=None):
         os.mkdir(save_pred_data_pth)
     # model_pth = main_path + "/DataTest/logs/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt"
 
-    test_block(load_test_data_pth,model_path,save_pred_data_pth)
+    test_block(load_test_data_pth,model_path,save_pred_data_pth, net_type)
 
     load_pred_data_pth = copy.deepcopy(save_pred_data_pth)
 
