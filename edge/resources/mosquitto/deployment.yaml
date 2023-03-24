@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  namespace: mosquitto
+  labels:
+    app: mosquitto
+spec:
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      containers:
+      - name: mosquitto
+        image: eclipse-mosquitto:2.0.15
+        ports:
+        - containerPort: 1883
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
+          limits:
+            memory: "2048Mi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: mosquitto-persistent-storage
+          mountPath: /mosquitto/data
+        - name: mosquitto-config
+          mountPath: /mosquitto/config/mosquitto.conf
+          subPath: mosquitto.conf
+        - name: mosquitto-password
+          mountPath: /mosquitto/config/password.txt
+          subPath: password.txt
+      volumes:
+      - name: mosquitto-persistent-storage
+        persistentVolumeClaim:
+          claimName: mq-pv-claim
+      - name: mosquitto-config
+        configMap:
+          name: mosquitto-config
+      - name: mosquitto-password
+        configMap:
+          name: mosquitto-password
