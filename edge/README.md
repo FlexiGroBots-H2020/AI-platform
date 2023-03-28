@@ -131,3 +131,100 @@ After that, the broker should be ready and can be reachable by using its endpoin
 
 You can test whether everything works fine by using a desktop MQTT client such as
 [MQTT Explorer](http://mqtt-explorer.com/).
+
+## Apache Camel K
+
+As stated in its [website](https://camel.apache.org/),
+"Apache Camel K is a lightweight integration framework built from
+Apache Camel that runs natively on Kubernetes and is specifically
+designed for serverless and microservice architectures."
+
+Apache Camel's functionalities are varied. Here we take advantage of the use of
+[Kamelets](https://camel.apache.org/camel-k/1.12.x/kamelets/kamelets-user.html)
+(Kamel route snippets), which "allow users to connect to external systems
+via a simplified interface, hiding all the low level details about how those
+connections are implemented.
+A Kamelet can act as "source" of data or alternatively as "sink".
+A source allows to consume data from an external system,
+while a sink can let you send data to an external system or execute a
+particular action and get a result."
+
+The integration of the KServe inference services over MQTT is based on
+the deployment of "source" Kamelets,
+consuming data from an MQTT broker and forwarding data to HTTP endpoints
+corresponding to inference services.
+To close the loop, inference services must publish predictions to the MQTT broker,
+on topics to which the clients are also subscribed.
+
+![Basic architecture](./docs/basic-architecture.png)
+
+### Installing Camel K
+
+To deploy Camel K and the mentioned Kamelets, first, the "kamel" CLI tool
+has to be installed. The procedure is explained
+[here](https://camel.apache.org/camel-k/1.12.x/installation/installation.html#procedure).
+Essentially, download (from the releases [webpage](https://github.com/apache/camel-k/releases))
+and uncompress the binary file named *kamel* and put it into your system path
+(for example, in `/usr/bin`).
+
+Then, create an appropriate namespace **in the same K8s cluster where KServe
+inference services will be deployed**:
+
+```bash
+$ kubectl create ns camel-k
+```
+
+Finally, deploy Camel K. You must provide a valid Docker registry and its
+corresponding credentials:
+
+```bash
+$ kamel install \
+    --registry <REGISTRY_ULR> \
+    --registry-auth-username <USER> \
+    --registry-auth-password <PASSWORD> \
+    --cluster-type kubernetes \
+    --build-publish-strategy=Spectrum \
+    -n camel-k
+```
+
+You can test the deployment of Camel K with this `Integration`
+[example](https://camel.apache.org/camel-k/1.12.x/running/running.html#no-cli-integration):
+
+```yaml
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  creationTimestamp: null
+  name: test-integration
+spec:
+  sources:
+  - content: "
+    import org.apache.camel.builder.RouteBuilder;
+    public class Sample extends RouteBuilder {
+      @Override
+      public void configure()
+      throws Exception {
+        from(\"timer:tick\")
+        .log(\"Hello Integration!\");
+       }
+      }"
+    name: Sample.java
+status: {}
+```
+
+```bash
+$ kubeclt apply -f ./resources/camel/test-integration.yaml -n camel-k
+```
+
+After a successful build (it takes 1-2 min.) you will see this (pod) log trace:
+
+```logs
+2023-03-14 12:52:51,416 INFO  [route1] (Camel (camel-1) thread #1 - timer://tick) Hello Integration!
+```
+
+You can delete this `Integration` after checking that it is running properly
+because it will not be used anymore.
+
+```bash
+$ kubeclt delete -f ./resources/camel/test-integration.yaml -n camel-k
+```
