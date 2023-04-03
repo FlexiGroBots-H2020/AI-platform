@@ -190,9 +190,9 @@ def preprocessing_block(GeoTiff,Shape,save_data_pth):
     print("Preprocessing block ended")
 
 
-def test_block(load_data_pth,model_pth,save_pred_pth, net_type):
+def test_block(load_data_pth,model_pth,save_pred_pth, net_type, device):
     print("Test block started")
-    device = 'cpu'
+    device_name = device
     if net_type == "UnetPlusPlus":
         segmentation_net = smp.UnetPlusPlus(in_channels=5, encoder_depth=3, classes=1,activation=None,decoder_channels=[64, 32, 16]).to(device=device)
     elif net_type == "SegNet":
@@ -203,9 +203,9 @@ def test_block(load_data_pth,model_pth,save_pred_pth, net_type):
         segmentation_net = UperNet(num_classes = 1, in_channels = 5, pretrained = False).to(device=device)
     elif net_type == "DUC_HDCNet":
         segmentation_net = DeepLab_DUC_HDC(num_classes = 1, in_channels = 5, pretrained = False).to(device=device)
-    # elif net_type = "UNet3":
-    #     segmentation_net = UNet3(n_channels=5, n_classes=1, height=512, width= 512, zscore = False)
-    load_checkpoint(torch.load(model_pth,map_location=torch.device('cpu')),segmentation_net)
+    elif net_type == "UNet3":
+        segmentation_net = UNet3(n_channels=5, n_classes=1, height=512, width= 512, zscore = 0).to(device=device)
+    load_checkpoint(torch.load(model_pth,map_location=torch.device(device_name)),segmentation_net)
     # segmentation_net.load_state_dict()
     # load_checkpoint(torch.load(model_pth,map_location=torch.device('cpu'))['state_dict'],segmentation_net)
     # load_checkpoint(torch.load(r'/home/stefanovicd/DeepSleep/Borovnice/UNET_YT_VERSION/my_checkpoint_unetplusplus__39_masked_lr_1e-05.pth.tar',map_location=torch.device(DEVICE))['state_dict'],model)
@@ -428,7 +428,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
 def new_print_function(a):
     print(a)
 
-def main(model_path, net_type, input_files_type=None):
+def main(model_path, net_type, device, input_files_type=None):
     new_print_function("main metod")
     # Loading test rasters
     #main_path = "/home/tloken/biosens/borovnice"
@@ -577,7 +577,7 @@ def main(model_path, net_type, input_files_type=None):
         os.mkdir(save_pred_data_pth)
     # model_pth = main_path + "/DataTest/logs/fully_trained_model_epochs_39_lr_1e-05_step_5_Lambda_parametar_1_loss_type_bce_arhitektura_UNet++_batch_size_4.pt"
 
-    test_block(load_test_data_pth,model_path,save_pred_data_pth, net_type)
+    test_block(load_test_data_pth,model_path,save_pred_data_pth, net_type, device)
 
     load_pred_data_pth = copy.deepcopy(save_pred_data_pth)
 
@@ -600,6 +600,7 @@ if __name__ == '__main__':
     print("dodajem argove")
     parser.add_argument("--model_path", type=str)
     parser.add_argument("--net_type", type=str)
+    parser.add_argument("--device", type=str, default="cpu")
     parser.add_argument('--new_location', type=str)
     print("kraj input argova")
     parser.add_argument('--output1-path', type=str, help='Path of the local file where the Output 1 data should be written.')
@@ -609,7 +610,8 @@ if __name__ == '__main__':
     print("Pokretanje Maina")
     model_path = args.model_path
     net_type = args.net_type
-    main(model_path = model_path, net_type = net_type)
+    device = args.device
+    main(model_path = model_path, net_type = net_type, device=device)
     Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
     print('3')
     with open(args.output1_path, 'w') as output1_file:

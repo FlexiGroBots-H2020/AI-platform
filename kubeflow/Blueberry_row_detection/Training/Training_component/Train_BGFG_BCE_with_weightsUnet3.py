@@ -39,7 +39,7 @@ def set_seed(seed):
     os.environ['PYTHONHASHSEED'] = str(seed)
     return torch_manual_seed, torch_manual_seed_cuda
 
-def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num_epochs, loss_type,Batch_size, net_type):
+def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num_epochs, loss_type,Batch_size, net_type, device):
 
 
     # lr = 1e-5
@@ -56,7 +56,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
 
     tmp = get_args('train', net_type)
     globals().update(tmp)
-    # print(device)
+    print(device)
     base_folder_path = os.getcwd()
     base_folder_path = base_folder_path.replace("\\", "/")
 
@@ -353,9 +353,10 @@ if __name__ == '__main__':
     parser.add_argument('--loss_type', type=str, default="['bce']")
     parser.add_argument('--Batch_size', type=str, default="[8]")
     parser.add_argument('--net_type', type=str, default="SegNet")
-    parser.add_argument('--trening_location', type=str, default="C:/Users/lazar/OneDrive/Desktop/TrainingComponentKatib/FullSet/trening_set_mini2/img")
-    parser.add_argument('--validation_location', type=str, default="C:/Users/lazar/OneDrive/Desktop/TrainingComponentKatib/FullSet/validation_set_mini2/img")
-    parser.add_argument('--test_location', type=str, default="C:/Users/lazar/OneDrive/Desktop/TrainingComponentKatib/FullSet/test_set_mini2/img")
+    parser.add_argument('--device', type=str, default="cpu")
+    parser.add_argument('--trening_location', type=str, default="C:/Users/daniv/OneDrive/Desktop/TrainingComponentKatib/FullSet/trening_set_mini2/img")
+    parser.add_argument('--validation_location', type=str, default="C:/Users/daniv/OneDrive/Desktop/TrainingComponentKatib/FullSet/validation_set_mini2/img")
+    parser.add_argument('--test_location', type=str, default="C:/Users/daniv/OneDrive/Desktop/TrainingComponentKatib/FullSet/test_set_mini2/img")
     parser.add_argument('--new_location', type=str)
     parser.add_argument('--output1-path', type=str, help='Path of the local file where the Output 1 data should be written.')
     args = parser.parse_args()
@@ -378,6 +379,7 @@ if __name__ == '__main__':
     loss_type = args.loss_type
     Batch_size = args.Batch_size
     net_type = args.net_type
+    device = args.device
 
     trening_location = args.trening_location
     validation_location = args.validation_location
@@ -415,6 +417,7 @@ if __name__ == '__main__':
     print(loss_type)
     print(Batch_size)
     print(net_type)
+    print(device)
     print(trening_location)
     print(validation_location)
     print(test_location)
@@ -446,7 +449,7 @@ if __name__ == '__main__':
                                 validation_location,
                                 test_location,
                                 p_index,lr[lr_index],lambda_parametar[lambd_index],stepovi_arr[step_index], num_epochs[num_of_epochs_index],
-                                loss_type[loss_type_index],Batch_size[Batch_size_index], net_type)
+                                loss_type[loss_type_index],Batch_size[Batch_size_index], net_type, device)
         # uporedna_tabela['TestSet IoU Metric '+str(p_index)] = IOU
     print("End of training component")
     print("End")
