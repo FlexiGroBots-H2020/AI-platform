@@ -14,3 +14,7 @@ spec:
     port: 1883
     targetPort: 1883
     protocol: TCP
+  - name: wss
+    port: 8080
+    targetPort: 8080
+    protocol: TCP

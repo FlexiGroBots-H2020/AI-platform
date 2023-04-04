@@ -240,6 +240,7 @@ data:
     #
     # listener port-number [ip address/host name/unix socket path]
     listener 1883 0.0.0.0
+    listener 8080
 
     # By default, a listener will attempt to listen on all supported IP protocol
     # versions. If you do not have an IPv4 or IPv6 interface you may wish to
@@ -289,6 +290,7 @@ data:
     # Certificate based TLS may be used with websockets, except that only the
     # cafile, certfile, keyfile, ciphers, and ciphers_tls13 options are supported.
     #protocol mqtt
+    protocol websockets
 
     # Set use_username_as_clientid to true to replace the clientid that a client
     # connected with with its username. This allows authentication to be tied to

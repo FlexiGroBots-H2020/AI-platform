@@ -25,37 +25,69 @@ The applied configuration is partially based on the following articles:
 ### Extend Traefik configuration
 
 First of all, it is required to modify the existing Traefik deployment
-to create a new `entrypoint` for MQTT.
-Edit the existing Traefik deployment as follows:
+to create new `entrypoints` for MQTT.
 
-```diff
-@@ -50,6 +50,7 @@
-     spec:
-       containers:
-       - args:
-         . . .
-         - --entrypoints.web.address=:8000/tcp
-         - --entrypoints.websecure.address=:8443/tcp
-+        - --entrypoints.mqtt.address=:5883/tcp
-         - --api.dashboard=true
-         - --ping=true
-         - --metrics.prometheus=true
-@@ -83,6 +84,9 @@
-         name: traefik
-         ports:
-         . . .
-         - containerPort: 8443
-           name: websecure
-           protocol: TCP
-+        - containerPort: 5883
-+          name: mqtt
-+          protocol: TCP
-         readinessProbe:
-           failureThreshold: 1
-           httpGet:
-```
+Note: this guide explains how to configure two `entrypoints` for `mqtt`
+(`tcp`) and `websockets` protocols using two different interfaces (ports).
+This might not be the case for other projects where only one of those would
+be required.
+More information on MQTT WebSockets (in Mosquitto) ca be found
+[here](https://cedalo.com/blog/enabling-websockets-over-mqtt-with-mosquitto/).
 
-In this project, port `5883` has been used, but this can be modified depending on the existing configuration.
+- Edit the existing Traefik service as follows:
+
+  ```diff
+  @@ -41,6 +41,16 @@
+      port: 8080
+      protocol: TCP
+      targetPort: 9080
+  +  - name: mqtt
+  +    port: 5883
+  +    protocol: TCP
+  +    targetPort: 5883
+  +  - name: wss
+  +    port: 5884
+  +    protocol: TCP
+  +    targetPort: 5884
+    selector:
+      app: traefik
+    sessionAffinity: None
+  ```
+
+- Edit the existing Traefik deployment as follows:
+
+  ```diff
+  @@ -50,6 +50,7 @@
+      spec:
+        containers:
+        - args:
+          . . .
+          - --entrypoints.web.address=:8000/tcp
+          - --entrypoints.websecure.address=:8443/tcp
+  +        - --entrypoints.mqtt.address=:5883/tcp
+  +        - --entrypoints.wss.address=:5884/tcp
+          - --api.dashboard=true
+          - --ping=true
+          - --metrics.prometheus=true
+  @@ -83,6 +84,9 @@
+          name: traefik
+          ports:
+          . . .
+          - containerPort: 8443
+            name: websecure
+            protocol: TCP
+  +        - containerPort: 5883
+  +          name: mqtt
+  +          protocol: TCP
+  +        - containerPort: 5884
+  +          name: wss
+  +          protocol: TCP
+          readinessProbe:
+            failureThreshold: 1
+            httpGet:
+  ```
+
+In this project, ports `5883` and `5884` has been used, but this can be modified depending on the existing configuration.
 
 ### Mosquitto pre-configuration steps
 
