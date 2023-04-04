@@ -260,3 +260,75 @@ because it will not be used anymore.
 ```bash
 $ kubeclt delete -f ./resources/camel/test-integration.yaml -n camel-k
 ```
+
+### MQTT Source bindings
+
+The Kamelet
+[MQTT Source binding](https://camel.apache.org/camel-kamelets/3.20.x/mqtt-source.html)
+resource enables the inference services to be reached over MQTT,
+using specific topics.
+Its manifest has the following structure and configuration options:
+
+```yaml
+apiVersion: camel.apache.org/v1alpha1
+kind: KameletBinding
+metadata:
+  name: mqtt-source-binding-<MODEL-NAME> # (1)
+  namespace: camel-k # (2)
+spec:
+  source:
+    ref:
+      kind: Kamelet
+      apiVersion: camel.apache.org/v1alpha1
+      name: mqtt-source
+    properties:
+      brokerUrl: tcp://<BROKER_ADDRESS>:<BROKER_PORT> # (3)
+      topic: common-apps/<MODEL-NAME>/input # (4)
+      clientId: mqtt-source-binding-<MODEL-NAME> # (5)
+      username: <BROKER_USER> # (6)
+      password: <BROKER_PASSWORD> # (6)
+  sink:
+      uri: http://<MODEL-NAME>.common-apps.svc.cluster.local/v1/models/<MODEL-NAME>:predict # (7)
+```
+
+This template is stored in
+[./resources/camel/mqtt-source-bindings/example.yaml](resources/camel/mqtt-source-bindings/example.yaml).
+
+1. Name of the resource (replace `<MODEL-NAME>` with the
+   appropriate, descriptive model identifier such as "anonymization-model").
+   Be consistent using the same `<MODEL-NAME>` value throughout
+   the manifest.
+2. `KameletBindings` **must be deployed in the same namespace
+   where the Camel K operator has been deployed**.
+3. The URL of the MQTT broker to connect to
+   (replace `<BROKER_ADDRESS>` and `<BROKER_PORT>`).
+4. The topic to which the clients of the `InferenceService` will publish to,
+   and to which the binding will be subscribed
+   (replace `<MODEL-NAME>`).
+
+   Note: `common-apps/<MODEL-NAME>/input` topics are used to publish
+   messages to be processed by the inference services,
+   and `common-apps/<MODEL-NAME>/output`
+   topics are used to publish the inference results.
+5. The client ID to use when connecting to the MQTT broker
+   (replace `<MODEL-NAME>`).
+6. Username and password to use when connecting to the MQTT broker
+   (replace `<BROKER_USER>` and `<BROKER_PASSWORD>`).
+7. `InferenceService` internal URI (replace `<MODEL-NAME>` twice).
+   This would be valid as long as **the `InferenceService` is deployed
+   in the `common-apps` namespace**, and `<MODEL-NAME>` matches the
+   `metadata.name` field of the `InferenceService` and the
+   `Model(kserve.KFModel)` instantiation name.
+   More details about `InferenceServices` can be found
+   [here](../kubeflow/kserve/README.md).
+
+To Create a new source `KameletBinding`, generate a K8s manifest
+from the template and deploy it by issuing the following command:
+
+```bash
+$ kubectl apply -f ./resources/camel/mqtt-source-bindings/<MODEL-NAME>.yaml
+```
+
+**Important**: note that the MQTT broker credentials go in plain text in the
+`KameletBinding` manifests.
+**Do not upload actual credentials to the repository!**
