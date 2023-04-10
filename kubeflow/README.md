@@ -234,13 +234,10 @@ data:
     enablePasswordDB: true
     staticPasswords:
     - email: user@example.com
-      hash: $2y$12$kAJmOQmkeaq5lNN8z3v9E.rS8cvd8Rm8MR3EbcWDEwPsFqq8mbpFS
-      # https://github.com/dexidp/dex/pull/1601/commits
-      # FIXME: Use hashFromEnv instead
+      hash: <HASH>
       username: user
-      userID: "15841185641784"
+      userID: "XXX"
     staticClients:
-    # https://github.com/dexidp/dex/pull/1664
     - idEnv: OIDC_CLIENT_ID
       redirectURIs: ["/login/oidc"]
       name: 'Dex Login Application'
