@@ -236,65 +236,75 @@ kubectl apply -f <manifests>.yaml
 - Modify `dex configmap` manifest in `kubeflow.yaml` to enable authentication based on GitHub. For this purpose, it is necessary to create an organization, and inside a team, so you can select the account that you want to give access to the system. 
 Optionally (recommended), default user creation and access can be disabled by removing `staticPasswords` section.
 
+git diff -Nuar fichero_original fichero_modificado
 
-```yaml
-data:
-  config.yaml: |
-    issuer: <KUBEFLOW_DOMAIN>/dex
-    storage:
-      type: kubernetes
-      config:
-        inCluster: true
-    web:
-      http: 0.0.0.0:5556
-    logger:
-      level: "debug"
-      format: text
-    connectors:
-    - type: github
-      # Required field for connector id.
-      id: github
-      # Required field for connector name.
-      name: GitHub
-      config:
-        # Credentials can be string literals or pulled from the environment.
-        clientID: <GIHUB_CLIENT_ID>
-        clientSecret: <GIHUB_CLIENT_SECRET>
-        redirectURI: <KUBEFLOW_DOMAIN>/dex/callback
-        orgs:
-        - name: <ORGANIZATION'S NAME>
-          team:
-          - <TEAM'S NAME>
-        loadAllGroups: true
-        useLoginAsID: true
+```diff
+--- auth3.yaml  2023-04-10 14:37:31.205665100 +0200
++++ auth2.yaml  2023-04-10 14:30:41.536212400 +0200
+@@ -5,14 +5,16 @@
+ namespace: auth
 
-    oauth2:
-      skipApprovalScreen: true
-    # enablePasswordDB is used to log-in with an e-mail. If you want to use a mail change to true
-    enablePasswordDB: false
-    staticPasswords:
-    - email: user@example.com
-      hash: *******************************************
-      # https://github.com/dexidp/dex/pull/1601/commits
-      # FIXME: Use hashFromEnv instead
-      username: user
-      userID: "*************"
-    staticClients:
-    # https://github.com/dexidp/dex/pull/****
-    - idEnv: OIDC_CLIENT_ID
-      redirectURIs: ["/login/oidc"]
-      name: 'Dex Login Application'
-      secretEnv: OIDC_CLIENT_SECRET
+ apiVersion: v1
+-
++
+ data:
+   config.yaml: |
+-    issuer: https://kubeflow.flexigrobots-h2020.eu/dex
++    issuer: XXXXX
+     storage:
+       type: kubernetes
+       config:
+-
++        inCluster: true
++    web:
++      http: 0.0.0.0:5556
+     logger:
+       level: "debug"
+       format: text
+@@ -24,19 +26,24 @@
+     name: GitHub
+     config:
+       # Credentials can be string literals or pulled from the environment.
+-      clientID: ******
+-      clientSecret: *****
++      clientID: XXXXXXX
++      clientSecret: XXXXXXX
+       redirectURI: https://kubeflow.flexigrobots-h2020.eu/dex/callback
++      orgs:
++      - name: FlexiGroBots-H2020
++        teams:
++        - kubeflow
++
++      loadAllGroups: true
++      useLoginAsID: true
+     oauth2:
+       skipApprovalScreen: true
+-    enablePasswordDB: true
+-  staticPasswords:
+-  - email: user@example.com
+-    hash: ********
+-    # https://github.com/dexidp/dex/pull/1601/commits
+-    # FIXME: Use hashFromEnv instead
+-    username: user
+-    userID: "xxxxx"
++  # enablePasswordDB is used to register with an e-mail. If you want to use a mail change to true
++    enablePasswordDB: false
+   staticClients:
+   # https://github.com/dexidp/dex/pull/1664
+-  - idEnv: OIDC_CLIENT_ID
+\ No newline at end of file
++  - idEnv: OIDC_CLIENT_ID
++    redirectURIs: ["/login/oidc"]
++    name: 'Dex Login Application'
++    secretEnv: OIDC_CLIENT_SECRET
++    ---
 ```
-
-
 
   Note: for debugging purposes, `dex` manifests can be also built by issuing:
 
   ```bash
   kustomize build common/dex/overlays/istio  > dex.yaml
   ```
-
 
 - Apply the manifest `.yaml` file:
 
@@ -331,7 +341,6 @@ data:
     sudo sysctl fs.inotify.max_user_instances=1280
     sudo sysctl fs.inotify.max_user_watches=655360
     ```
-
 
 - In order to check the access to the Kubeflow's dashboard, port `80` of Istio `Ingress-Gateway service`
   can be forwarded to the host:
@@ -406,12 +415,10 @@ kubectl apply -f envoyfilter.yaml
 
 #### Enabling access to Kubeflow Pipelines
 
-
 Once a user has logged in, a `PodDefault` resource must be created in user's
 namespace to enable the pipeline upgrade process from Jupyter Notebooks.
 Apply the `deployment/040-pod_default_multiuser.yaml` manifest replacing in each case
 the name of the corresponding namespace:
-
 
 ```yaml
 apiVersion: kubeflow.org/v1alpha1
@@ -429,10 +436,7 @@ kubectl apply -f deployment/040-pod_default_multiuser.yaml
 
 This task can be automated by running the `deployment/create_PodDefault.sh` script:
 
-
-
 ./create_PodDefault.sh <USER_PROFILE_NAMESPACE>
-
 
 ## Using GPU
 
