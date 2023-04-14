@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: mosquitto
+  namespace: mosquitto
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - wss
+  routes:
+    - match: Host(`mosquitto.platform.flexigrobots-h2020.eu`)
+      kind: Rule
+      services:
+        - name: mosquitto
+          port: 8080
