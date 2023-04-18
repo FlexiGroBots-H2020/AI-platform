@@ -233,24 +233,23 @@ kubectl apply -f <manifests>.yaml
   istio-ingressgateway   LoadBalancer   10.43.227.100   213.227.145.163   15021:32662/TCP,80:32297/TCP,443:31681/TCP,31400:31274/TCP,15443:32599/TCP   10m
   ```
 
-- Modify `dex configmap` manifest in `kubeflow.yaml` to enable authentication based on GitHub. For this purpose, it is necessary to create an organization, and inside a team, so you can select the account that you want to give access to the system. 
-Optionally (recommended), default user creation and access can be disabled by removing `staticPasswords` section.
+- Modify `dex configmap` manifest in `kubeflow.yaml` to enable authentication based on GitHub. For this purpose, it is necessary to create an organization, and within it a team. Then you can choose the user account that has access to the platform. 
+The values ClientID and ClientSecret can be obtained from organization settings in "Developer settings", and from this, we click on OAuth Group. We select Kubeflow dex, and in the new window, we can see the ClientID and ClientSecretID.
 
-git diff -Nuar fichero_original fichero_modificado
+
 
 ```diff
---- auth3.yaml  2023-04-10 14:37:31.205665100 +0200
-+++ auth2.yaml  2023-04-10 14:30:41.536212400 +0200
+--- auth.yaml  2023-04-10 14:37:31.205665100 +0200
++++ auth.yaml  2023-04-10 14:30:41.536212400 +0200
 @@ -5,14 +5,16 @@
  namespace: auth
 
  apiVersion: v1
--
-+
+
  data:
    config.yaml: |
 -    issuer: https://kubeflow.flexigrobots-h2020.eu/dex
-+    issuer: XXXXX
++    issuer: https://web_Example.com/dex
      storage:
        type: kubernetes
        config:
@@ -454,7 +453,9 @@ kubectl apply -f deployment/040-pod_default_multiuser.yaml
 
 This task can be automated by running the `deployment/create_PodDefault.sh` script:
 
+```bash
 ./create_PodDefault.sh <USER_PROFILE_NAMESPACE>
+```
 
 ## Using GPU
 
