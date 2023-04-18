@@ -1,0 +1,19 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: KameletBinding
+metadata:
+  name: mqtt-source-binding-<MODEL-NAME>
+  namespace: camel-k
+spec:
+  source:
+    ref:
+      kind: Kamelet
+      apiVersion: camel.apache.org/v1alpha1
+      name: mqtt-source
+    properties:
+      brokerUrl: tcp://<BROKER_ADDRESS>:<BROKER_PORT>
+      topic: common-apps/<MODEL-NAME>/input
+      clientId: mqtt-source-binding-<MODEL-NAME>
+      username: <BROKER_USER>
+      password: <BROKER_PASSWORD>
+  sink:
+      uri: http://<MODEL-NAME>.common-apps.svc.cluster.local/v1/models/<MODEL-NAME>:predict

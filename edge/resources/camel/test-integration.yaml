@@ -1,0 +1,19 @@
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  creationTimestamp: null
+  name: test-integration
+spec:
+  sources:
+  - content: "
+    import org.apache.camel.builder.RouteBuilder;
+    public class Sample extends RouteBuilder {
+      @Override
+      public void configure()
+      throws Exception {
+        from(\"timer:tick\")
+        .log(\"Hello Integration!\");
+       }
+      }"
+    name: Sample.java
+status: {}
