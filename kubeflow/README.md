@@ -140,7 +140,7 @@ The installation can be done using Helm by issuing the following commands (more 
 
 ```bash
 helm repo add metallb https://metallb.github.io/metallb
-helm install metallb metallb/metallb
+helm install metallb metallb/metallb -n metallb-system --create-namespace
 ```
 
 Then you need to provide the IP(s) to assign to `LoadBalancer` services (more details [here](https://metallb.org/configuration/)).
@@ -225,7 +225,7 @@ kubectl apply -f <manifests>.yaml
   kind: Service
   ```
 
-  Later on, when manifiests are installed, the `EXTERNAL-IP` value of the service will be configured according to the configuration provided in `IPAddressPool` resource:
+  Later on, when manifests are installed, the `EXTERNAL-IP` value of the service will be configured according to the configuration provided in `IPAddressPool` resource:
 
   ```bash
   $ kubectl get svc istio-ingressgateway -n istio-system
@@ -363,6 +363,8 @@ git diff -Nuar fichero_original fichero_modificado
 
 A DNS domain should be available and configured for the IP address of the Kubernetes node where the `Istio` ingress will be deployed.
 
+**Option A: generate certificates using Let's Encrypt** (not currently in use)
+
 An HTTPS certificate can be obtained from a provider or from [Let's Encrypt](https://letsencrypt.org/). The following steps can be used to automate the retrieval of a certificate:
 
 - Create two `Issuer` objects for staging and production environments.
@@ -395,23 +397,39 @@ the domain names you are adding to certificates.
 In summary, Let’s Encrypt gives a token to your ACME client, and your ACME client puts
 a file on your web server at `http://<DOMAIN>/.well-known/acme-challenge/<TOKEN>`.
 The problem is that an Istio's `Envoyfilter` resource called `authn-filter` is blocking
-communitacions towards that `url` and hence the challange is never completed.
+communications towards that `url` and hence the challenge is never completed.
 
-A workaround to overcome this issue is to disable the `Envoyfilter` mentionend above,
-let the challanges complete and finally re-enable the `Envoyfilter` again:
+A workaround to overcome this issue is to disable the `Envoyfilter` mentioned above,
+let the challenges complete and finally re-enable the `Envoyfilter` again:
 
 ```bash
 kubectl get envoyfilters.networking.istio.io authn-filter -n istio-system -o yaml > envoyfilter.yaml
 kubectl delete envoyfilters.networking.istio.io authn-filter -n istio-system
 ```
 
-After a few minutes, challanges will be completed and the certificate status will read
+After a few minutes, challenges will be completed and the certificate status will read
 "Certificate is up to date and has not expired".
 Then, re-deploy the `Envoyfilter`:
 
 ```bash
 kubectl apply -f envoyfilter.yaml
 ```
+
+**Option B: use manually-generated certificates**
+
+- Create a secret with TLS certificate and key for the ingress gateway:
+
+  ```bash
+  kubectl create -n istio-system secret tls kubeflow-domain-man-cert \
+    --key=<PATH_TO_CERTS>.key \
+    --cert=<PATH_TO_CERTS>.crt
+  ```
+
+- Apply the new configuration for Istio Ingress-Gateway:
+
+  ```bash
+  kubectl apply -f deployment/031-gw_https_manual_certificates.yaml
+  ```
 
 #### Enabling access to Kubeflow Pipelines
 
