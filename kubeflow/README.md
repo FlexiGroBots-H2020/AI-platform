@@ -248,55 +248,51 @@ The values ClientID and ClientSecret can be obtained from organization settings 
 
  data:
    config.yaml: |
--    issuer: https://kubeflow.flexigrobots-h2020.eu/dex
-+    issuer: https://web_Example.com/dex
+-    issuer: http://dex.auth.svc.cluster.local:5556/dex
++    issuer: https://kubeflow.project-example.com/dex
      storage:
        type: kubernetes
        config:
--
-+        inCluster: true
-+    web:
-+      http: 0.0.0.0:5556
+         inCluster: true
+     web:
+       http: 0.0.0.0:5556
      logger:
        level: "debug"
        format: text
-@@ -24,19 +26,24 @@
-     name: GitHub
-     config:
-       # Credentials can be string literals or pulled from the environment.
--      clientID: ******
--      clientSecret: *****
-+      clientID: XXXXXXX
-+      clientSecret: XXXXXXX
-       redirectURI: https://kubeflow.flexigrobots-h2020.eu/dex/callback
-+      orgs:
-+      - name: FlexiGroBots-H2020
-+        teams:
-+        - kubeflow
-+
-+      loadAllGroups: true
-+      useLoginAsID: true
++    connectors:
++      - type: github 
++        # Required field for connector id.
++        id: github
++        # Required field for connector name.
++        name: GitHub
++        config:
++          # Credentials can be string literals or pulled from the environment.
++          clientID: XXXXXXXXXXX
++          clientSecret: XXXXXXXXXXXXXXXXXXXX
++          redirectURI: https://kubeflow.project-example.com/dex/callback
++          orgs:
++            - name: repository/project-name
++              teams:
++                - team-name
++          loadAllGroups: true
++          useLoginAsID: true
      oauth2:
        skipApprovalScreen: true
 -    enablePasswordDB: true
--  staticPasswords:
--  - email: user@example.com
--    hash: ********
--    # https://github.com/dexidp/dex/pull/1601/commits
--    # FIXME: Use hashFromEnv instead
--    username: user
--    userID: "xxxxx"
-+  # enablePasswordDB is used to register with an e-mail. If you want to use a mail change to true
++    # enablePasswordDB is used to register with an e-mail. If you want to use a mail change to true
 +    enablePasswordDB: false
-   staticClients:
-   # https://github.com/dexidp/dex/pull/1664
--  - idEnv: OIDC_CLIENT_ID
-\ No newline at end of file
-+  - idEnv: OIDC_CLIENT_ID
-+    redirectURIs: ["/login/oidc"]
-+    name: 'Dex Login Application'
-+    secretEnv: OIDC_CLIENT_SECRET
-+    ---
+-    staticPasswords:
+-      - email: user@example.com
+-        hash: ********
+-        # https://github.com/dexidp/dex/pull/1601/commits
+-        # FIXME: Use hashFromEnv instead
+-        username: user
+-        userID: "xxxxx"
+     staticClients:
+       - idEnv: OIDC_CLIENT_ID
+         redirectURIs: ["/login/oidc"]
+         name: 'Dex Login Application'
+         secretEnv: OIDC_CLIENT_SECRET
 ```
 
   Note: for debugging purposes, `dex` manifests can be also built by issuing:
