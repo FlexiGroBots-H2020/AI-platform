@@ -17,7 +17,7 @@ class config_func_unet3:
         self.dataset = "Borovnica"            # "mini" or "full"
 
         if self.server:                  # Depending on server flag, we use different device settings:
-                self.device = "cuda"     # if server is True, that is, if we are using server machine, device will be set as "cuda"
+            self.device = "cuda"     # if server is True, that is, if we are using server machine, device will be set as "cuda"
         elif self.server == False:
             self.device = "cpu"          # else if server is False and we are using local machine or server access node, device will be set as "cpu"
         self.classes_labels = ['Borovnica']  # Classes that we are trying to detect. For BCE, background class is rejected

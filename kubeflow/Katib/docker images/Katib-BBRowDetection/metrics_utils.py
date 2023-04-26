@@ -1,11 +1,9 @@
 import numpy as np
 import torch
 import sys
-from configUnet3 import config_func_unet3
-cfg = config_func_unet3(False)
 
 
-def calc_f1_batch(model_output, target_var):
+def calc_f1_batch(model_output, target_var, server):
     batch_length = target_var.shape[0]
     scores = []
     sigmoid_function = torch.nn.Sigmoid()
@@ -14,7 +12,10 @@ def calc_f1_batch(model_output, target_var):
         thresholded = model_output[i, :, :, :] > 0.5
         thresholded_tmp = thresholded.byte()
         picturex = torch.squeeze(thresholded_tmp)
-        picturex = picturex.detach().numpy()
+        if server:
+            picturex = picturex.detach().cpu().numpy()
+        else:
+            picturex = picturex.detach().numpy()
         picturex = picturex.astype(float)
         pic_results = calc_f1_picture(picturex, target_var[i])
         scores.append(pic_results)

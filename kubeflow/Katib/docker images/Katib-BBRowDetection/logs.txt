@@ -216,3 +216,43 @@ python Train_BGFG_BCE_with_weightsUnet3.py --learning_rate 0.1 --num_epochs 10 -
 
 2023-03-03T14:51:48Z INFO     {metricName: loss, metricValue: 2140111.7500}
 
+2023-03-20T11:11:16Z INFO     {metricName: accuracy, metricValue: 0.4301}
+
+2023-03-20T11:12:41Z INFO     {metricName: accuracy, metricValue: 0.6613}
+
+2023-03-20T11:14:04Z INFO     {metricName: accuracy, metricValue: 0.6666}
+
+2023-03-20T11:15:27Z INFO     {metricName: accuracy, metricValue: 0.6667}
+
+2023-03-20T11:16:49Z INFO     {metricName: accuracy, metricValue: 0.6666}
+
+2023-03-20T11:18:10Z INFO     {metricName: accuracy, metricValue: 0.6665}
+
+2023-03-20T11:19:34Z INFO     {metricName: accuracy, metricValue: 0.6662}
+
+2023-03-20T11:21:02Z INFO     {metricName: accuracy, metricValue: 0.6663}
+
+2023-03-20T11:22:30Z INFO     {metricName: accuracy, metricValue: 0.6663}
+
+2023-03-20T11:23:58Z INFO     {metricName: accuracy, metricValue: 0.6664}
+
+2023-03-20T11:25:27Z INFO     {metricName: accuracy, metricValue: 0.6673}
+
+2023-03-20T11:26:50Z INFO     {metricName: accuracy, metricValue: 0.6767}
+
+2023-03-20T11:28:11Z INFO     {metricName: accuracy, metricValue: 0.7468}
+
+2023-03-20T11:29:34Z INFO     {metricName: accuracy, metricValue: 0.7500}
+
+2023-03-20T11:30:57Z INFO     {metricName: accuracy, metricValue: 0.7846}
+
+2023-03-20T11:32:20Z INFO     {metricName: accuracy, metricValue: 0.7794}
+
+2023-03-20T11:33:48Z INFO     {metricName: accuracy, metricValue: 0.7525}
+
+2023-03-20T11:35:16Z INFO     {metricName: accuracy, metricValue: 0.7903}
+
+2023-03-20T11:36:44Z INFO     {metricName: accuracy, metricValue: 0.7851}
+
+2023-03-20T11:38:13Z INFO     {metricName: accuracy, metricValue: 0.7912}
+
