@@ -120,7 +120,6 @@ sudo vim /etc/exports
 // Export the NFS Share Directory
 sudo exportfs -a
 sudo systemctl restart nfs-kernel-server
-sudo ufw allow from 12.34.56.78/32 to any port nfs
 ```
 
 The installation of the provisioner is done with the following command:
