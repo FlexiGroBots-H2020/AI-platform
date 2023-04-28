@@ -100,6 +100,29 @@ export KUBECONFIG=<PATH>
 
 For the purpose of this guide, [NFS subdir external provisioner is being used](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner). A NFS server must be available.
 
+The first step is to have our NFS server ready. How can we do that in a easy way? In our case our NFS server will be the master node. So to set up our NFS server in master node we need to execute in this master node (please refer to https://www.tecmint.com/install-nfs-server-on-ubuntu/ for more information):
+
+```
+// Install NFS Kernel Server
+sudo apt install nfs-kernel-server
+
+// Create an NFS Export Directory
+sudo mkdir -p /nfsroot/kubeflow_nfs
+sudo chown -R nobody:nogroup /nfsroot/kubeflow_nfs/
+sudo chmod 777 /nfsroot/kubeflow_nfs/
+
+// Grant NFS Share Access to Client Systems
+sudo vim /etc/exports
+
+// Add clients (IP of server in our kubernetes cluster) at the end of the file, for example: 
+// /nfsroot/kubeflow_nfs  12.34.56.78/32(rw,no_root_squash,no_subtree_check)
+
+// Export the NFS Share Directory
+sudo exportfs -a
+sudo systemctl restart nfs-kernel-server
+sudo ufw allow from 12.34.56.78/32 to any port nfs
+```
+
 The installation of the provisioner is done with the following command:
 
 ```bash
@@ -114,6 +137,24 @@ Mark the new `StorageClass` as default:
 
 ```bash
 kubectl patch storageclass nfs-client -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+If the previous command fails then execute:
+```
+kubectl edit storageclass nfs-client
+
+// Add this line in "metadata" section
+storageclass.kubernetes.io/is-default-class = "true"
+```
+
+If you want to test if NFS subdir external provisioner is working please execute:
+```
+kubectl create -f deploy/test-claim.yaml -f deploy/test-pod.yaml
+
+// You can check in path /nfsroot/kubeflow_nfs/PVC-random-hash (in master node) that a file called SUCCESS was created. This means NFS subdir external provisioner is working correctly
+
+// To delete this test
+kubectl delete -f deploy/test-pod.yaml -f deploy/test-claim.yaml
 ```
 
 Note:
