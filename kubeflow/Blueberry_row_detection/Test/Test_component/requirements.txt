@@ -1,5 +1,6 @@
-opencv-python
-segmentation_models_pytorch
-pandas
-scikit-learn
-seaborn
+GDAL==3.3.3
+matplotlib
+numpy
+torch
+torchvision
+segmentation-models-pytorch

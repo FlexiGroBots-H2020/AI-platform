@@ -1,36 +1,30 @@
-FROM continuumio/miniconda3
-WORKDIR /pipelines
-COPY requirements.txt /pipelines
+# Use the official GDAL base image
+FROM ghcr.io/osgeo/gdal:ubuntu-full-latest
 
-# Make RUN commands use `bash --login`:
-SHELL ["/bin/bash", "--login", "-c"]
+# Set the working directory to /app
+WORKDIR /app
 
-COPY environment.yml .
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN pip install -r requirements.txt
+# Install additional Python libraries and dependencies
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    libopencv-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Install PyTorch with GPU support
+RUN pip3 install --upgrade pip
+RUN pip3 install torch torchvision -f https://download.pytorch.org/whl/cu111/torch_stable.html
 
+# Install other libraries
+RUN pip3 install numpy
+RUN pip3 install opencv-python-headless
+RUN pip3 install segmentation-models-pytorch
+RUN pip3 install matplotlib
 
-RUN apt-get update
-RUN apt-get install ffmpeg libsm6 libxext6  -y
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-
-RUN conda env create -f environment.yml
-
-# Initialize conda in bash config fiiles:
-RUN conda init bash
-
-RUN conda activate myenv
-
-RUN conda install gdal
-
-RUN conda install pytorch torchvision torchaudio cudatoolkit matplotlib tensorboard -c pytorch
-
-
-
-COPY . /pipelines
-
-RUN chmod +x /pipelines/test_pipeline.py
-
-ENTRYPOINT ["python"]
-CMD ["/pipelines/test_pipeline.py"]
+# Run delineation_and_zones_main.py when the container launches
+CMD ["python3", "test_pipeline.py"]

@@ -1,39 +1,27 @@
 from osgeo import gdal,ogr,osr
-from calendar import EPOCH
-from signal import pthread_sigmask
-from typing import Final
-from unittest.mock import patch
 import matplotlib.pyplot as plt
-from numpy import binary_repr
-import torch.utils.data.dataloader
-import torch
-from torch.utils.tensorboard import SummaryWriter
-import random
-from Unet_LtS import UNet3
-import segmentation_models_pytorch as smp
-# from torchsummary import summary
-import os
-from Train_BGFG_BCE_with_weightsUnet3 import main
-from print_utils import *
-from data_utils import *
-from loss_utils import *
-from model_utils import *
-from tb_utils import *
-from metrics_utils import*
-from configUnet3 import config_func_unet3
-# from focal_loss import FocalLoss2
-import time
 import numpy as np
-import time
-import matplotlib.pyplot as plt
+import torch
+import torch.utils.data.dataloader
+import segmentation_models_pytorch as smp
+import os
+import copy
 import argparse
-import time
+import cv2
 from pathlib import Path
+###########################################
+from Unet_LtS import UNet3
 from SegNet import SegResNet
 from UperNet import UperNet
 from PSPNet import PSPDenseNet
 from DUC_HDCNet import DeepLab_DUC_HDC
-import cv2
+# from Train_BGFG_BCE_with_weightsUnet3 import main
+# from print_utils import *
+# from data_utils import *
+# from loss_utils import *
+# from model_utils import *
+# from tb_utils import *
+# from metrics_utils import*
 
 SHRT_MAX = 32767
 
@@ -111,8 +99,8 @@ def augmentation_and_saving(img,label,path_img,path_label,testing_flag = True,pn
             np.save(path_img + '_rot90' + '.npy', rot1_img)
             np.save(path_img + '_rot180' + '.npy', rot2_img)
             np.save(path_img + '_rot270' + '.npy', rot3_img)
-        label = cv.flip(label,flipCode=1)
-        img = cv.flip(img,flipCode=1)
+        label = cv2.flip(label,flipCode=1)
+        img = cv2.flip(img,flipCode=1)
 
         rot1_label = np.rot90(label)
         rot2_label = np.rot90(rot1_label)
@@ -218,8 +206,10 @@ def test_block(load_data_pth,model_pth,save_pred_pth, net_type, device):
     for sample in samples:
         img = np.load(load_data_pth + "/" + sample)
         img = torch.tensor(img).permute(2,0,1).unsqueeze(0)
+        img = img.to("cuda:0")
         pred_sample = segmentation_net(img.float()/255)
-        print("unique values of input: ",np.unique(img.float()/255))
+        img_cpu = img.cpu()
+        print("unique values of input: ", np.unique(img_cpu.float()/255))
         sigmoid_func = torch.nn.Sigmoid()
         preds_sample2 = sigmoid_func(pred_sample)
         pred_sample_bin = (preds_sample2 > 0.2).byte()
@@ -592,9 +582,8 @@ def main(model_path, net_type, device, input_files_type=None):
 
 if __name__ == '__main__':
     print("START Test component")
-    print("END")
-    print(" output file")
-
+    print(torch.cuda.is_available())
+    print(torch.version.cuda)
     print("pravim parser")
     parser = argparse.ArgumentParser(description='My program description')
     print("dodajem argove")
