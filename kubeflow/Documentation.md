@@ -315,7 +315,7 @@ experiment = V1beta1Experiment(
 )
 ```
 
-The last step includs 
+The final step includes creating Katib client and corresponding experiment in specified Kubeflow namespace  
 
 ```python
 # Create client.
