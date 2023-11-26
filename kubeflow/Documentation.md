@@ -89,6 +89,18 @@ Running the experiment should be the same as mentioned in “Running a custom ex
 __Note__:
 After running the pipeline, the download component will download the data to the local volume and the data will be accessible until it is deleted. After running the pipeline again, data will be overwritten, but nothing will change as it is the same data. If there is a need for frequent running of the same pipeline (for example because of changing some hyperparameter), to avoid waiting for the download component to be executed, we advise to prune the download component.
 
+## Running an AutoML experiment
+
+Documentation and guidelines for running Katib/AutoML experiment, as well as the examples are provided [here](https://github.com/FlexiGroBots-H2020/AI-platform/tree/biosens/kubeflow/Katib)
+
+Another example of running AutoML hyperparameter search for training blueberry rows detection model will be explained below.
+
+As explained in the Katib doc, AutoML experiments can be created through the Kubeflow SDK in the AutoML Experiments section, but it is also possible to generate these experiments through the notebook. This approach allows us to generate YAML files in a more intuitive way then through the SDK as it gives us insight whats happening under the hub, while in SDK these YAML files are meant to be written on our own (or copied from the existing files) which could lead to unintended errors.
+
+We will use [Katib-BBRowDetection.ipynb](https://github.com/FlexiGroBots-H2020/AI-platform/blob/biosens/kubeflow/Katib/ipynb%20files/Katib-BBRowDetection.ipynb) as an example notebook. 
+
+Initial steps include installing:
+
 
 ## Blueberry row detection - Inference service
 
