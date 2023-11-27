@@ -99,6 +99,7 @@ As explained in the Katib doc, AutoML experiments can be created through the Kub
 
 We will use [Katib-BBRowDetection.ipynb](https://github.com/FlexiGroBots-H2020/AI-platform/blob/biosens/kubeflow/Katib/ipynb%20files/Katib-BBRowDetection.ipynb) as an example notebook. 
 
+### Initial steps
 Initial steps include installing:
 ```python
 !pip install kfp==1.8.18
@@ -128,7 +129,7 @@ from kubeflow.katib import V1beta1FilterSpec
 ```
 The next steps represent experiment configuration in the same way as in SDK:
 
-1. Metadata - defining experiment name and namespace
+### 1. Metadata - defining experiment name and namespace
 ```python
 experiment_name = "katib-bbrow-detection-rebuild-final"
 namespace = "dimitrijestefanovic97"
@@ -138,14 +139,14 @@ metadata = V1ObjectMeta(
     namespace=namespace
 )
 ```
-2. Trial threshold - # Specifying trial thresholds such as maximum number of trial, maximum number of failed trials or number of trials that run in parallel
+### 2. Trial threshold - # Specifying trial thresholds such as maximum number of trial, maximum number of failed trials or number of trials that run in parallel
 
 ```python
 max_trial_count = 20
 max_failed_trial_count = 5
 parallel_trial_count = 3
 ```
-3. Objective - Specifying what is the metric we will monitor during parameter tuning as well as the goal.
+### 3. Objective - Specifying what is the metric we will monitor during parameter tuning as well as the goal.
 
 ```python
 objective = V1beta1ObjectiveSpec(
@@ -154,14 +155,14 @@ objective = V1beta1ObjectiveSpec(
     objective_metric_name="accuracy"
 )
 ```
-4. Search Algorithm - The Search Algorithm is responsible for navigating through the optimization search space
+### 4. Search Algorithm - The Search Algorithm is responsible for navigating through the optimization search space
 ```python
 algorithm = V1beta1AlgorithmSpec(
     algorithm_name="grid",
 )
 ```
-5. Early stopping - Allows you to avoid overfitting when you train your model during Katib Experiments. In our case it was skiped
-6. Hyperparameters - These will be used to construct the optimization search space. Katib will be generating Trials to test different combinations of these parameters in order to find the optimal set
+### 5. Early stopping - Allows you to avoid overfitting when you train your model during Katib Experiments. In our case it was skiped
+### 6. Hyperparameters - These will be used to construct the optimization search space. Katib will be generating Trials to test different combinations of these parameters in order to find the optimal set
 ```python
 # In this example we tune learning rate, batch size, number of epochs and architecture type.
 parameters = [
@@ -201,7 +202,7 @@ parameters = [
     )
 ]
 ```
-7. Metrics Collector - Define how Katib should collect the metrics from
+### 7. Metrics Collector - Define how Katib should collect the metrics from
 ```python
 metrics = V1beta1MetricsCollectorSpec(
     source=V1beta1SourceSpec(
@@ -219,7 +220,7 @@ metrics = V1beta1MetricsCollectorSpec(
 )
 
 ```
-8. Experimental trial template - Define the Trial's YAML.
+### 8. Experimental trial template - Define the Trial's YAML.
 ```python
 trial_spec = {
     "apiVersion": "batch/v1",
@@ -289,7 +290,7 @@ trial_template = V1beta1TrialTemplate(
 )
 ```
 
-
+### Generating an experiment
 Now that we defined all the instances and components, everything is ready for generating an experiment:
 
 
@@ -329,7 +330,8 @@ Underneath the final cell in the notebook, there should be the experiment config
 
 ![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/afeecb8bc5b08c2375eb2657ec423d0d61094a36/experiments2.png)
 
-Experiment details:
+### Experiment details:
+
 ![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/f968fa7b05d4004333efc31eee2bd0a35d689374/details.png)
 
 Kubeflow SDK gives us live overview of AutoML experiments and what combination of hyperparameters is potentially the optimal one with corresponding metric such as accuracy:
