@@ -324,6 +324,31 @@ kclient = KatibClient()
 # Create your Experiment.
 kclient.create_experiment(experiment,namespace="dimitrijestefanovic97")
 ```
+
+Underneath the final cell in the notebook, there should be the experiment configuration printed after its execution. Also there should be a link that leads to the Kubeflow SDK and its AutoML experiments section.
+
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/afeecb8bc5b08c2375eb2657ec423d0d61094a36/experiments2.png)
+
+Experiment details:
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/f968fa7b05d4004333efc31eee2bd0a35d689374/details.png)
+
+Kubeflow SDK gives us live overview of AutoML experiments and what combination of hyperparameters is potentially the optimal one with corresponding metric such as accuracy:
+
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/97054d0011b020a2c38a049179abb26d9becfee3/overview.png)
+
+In this experiment the hyperparameters we are trying to tune are learning rate, batch size and net type, that is we are also trying to figure out which segmentation model architecture is the most suitable for this task.
+
+Each trial can be observed separately and inspected. It should be noted that as soon there is new potentially optimal trial it is highlighted in yellow:
+
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/0d5485dcd5961bdcd20ff7032dbe6506c6371f28/optimal_yellow.png)
+
+For individual trials there are logs that can be tracked in real time: 
+
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/9684221f191801dedfac13838faf49c05ee96aa8/logs.png)
+
+After all the trials are finished, the combination of hyper parameters with the best metrics can be used in the classic training procedure explained in the previous section and it should provide reliable segmentation model.
+
+
 ## Blueberry row detection - Inference service
 
 ## Delineation and zoning - Inference service
