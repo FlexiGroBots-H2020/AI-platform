@@ -353,7 +353,15 @@ After all the trials are finished, the combination of hyper parameters with the 
 
 ## Blueberry row detection - Inference service
 
+We developed an inference service pipeline for blueberry row detection using state-of-the-art deep learning models (trained using AI platform). The pipeline consists of three components or blocks. Through this pipeline we must firstly download data from the data storage (minIO), then we have to choose a part of parcel where we want to detect blueberry rows and lastly provide the detected rows back to our data storage in tif, shp and png formats, including the metrics that describe how accurate the model was. 
+
+## Vegetation index maps calculator - Inference service
+
+We developed an inference service pipeline for calculating vegetation index(VI) maps using UAV multispectral data/orthomosaics. The pipeline consists of three components or blocks. Through this pipeline, as in all previous pipelines, we must firstly download data from the data storage (minIO), then we have to choose a part of parcel where we want to calculate VI maps and lastly provide the maps back to our data storage in tif or any other suitable format.
+
 ## Delineation and zoning - Inference service
+
+We developed an inference service pipeline for Delineation and zoning using UAV multispectral data/orthomosaics and ML techniques. The pipeline consists of three components or blocks. Again, we must first download data from the data storage (minIO), then we have to choose a part of parcel where we want to calculate vegetation indices and generate maps that are further being used in ML pipeline for delineation and zoning. Lastly we need to provide the parcel zones back to our data storage in tif, shp or any other suitable format.
 
 ## Delineation and zoning + Soil Sampling point generation
 
