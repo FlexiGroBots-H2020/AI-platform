@@ -93,7 +93,7 @@ After running the pipeline, the download component will download the data to the
 
 Documentation and guidelines for running Katib/AutoML experiment, as well as the examples are provided [here](https://github.com/FlexiGroBots-H2020/AI-platform/tree/biosens/kubeflow/Katib)
 
-Another example of running AutoML hyperparameter search for training blueberry rows detection model will be explained below.
+Another example of running AutoML hyperparameter search for training blueberry rows detection model will be explained below. All the scripts needed for reproducing this experiment can also be found on the link above.
 
 As explained in the Katib doc, AutoML experiments can be created through the Kubeflow SDK in the AutoML Experiments section, but it is also possible to generate these experiments through the notebook. This approach allows us to generate YAML files in a more intuitive way then through the SDK as it gives us insight whats happening under the hub, while in SDK these YAML files are meant to be written on our own (or copied from the existing files) which could lead to unintended errors.
 
