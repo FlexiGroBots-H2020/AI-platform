@@ -1,6 +1,48 @@
 # Kubeflow AI Platform - Documentation
 
-## Running a custom experiment
+## Running a custom ML experiment/Pipeline
+
+Kubeflow Pipelines is a platform for building and deploying portable, scalable machine learning (ML) workflows based on Docker containers
+
+### Preparation steps
+In order to run an experiment, there is a preparation procedure that includes following steps
+
+### Pipeline generation
+
+A pipeline is a description of an ML workflow, including all of the components in the workflow and how they combine in the form of a graph. The pipeline includes the definition of the inputs (parameters) required to run the pipeline and the inputs and outputs of each component.
+A pipeline component is a self-contained set of user code, packaged as a Docker image, that performs one step in the pipeline. For example, a component can be responsible for data preprocessing, data transformation, model training, and so on. In our typical pipeline configuration there are three components that will be explained below.
+
+### 1. Dockerization - Kubeflow must be provided a docker image of the source code it is running.
+
+__IMPORTANT NOTE__: Including Parser in source code
+
+In order for the Pipeline to be able to run the provided docker image with the appropriate hyperparameters and arguments, the hyperparameters must be parsed by the argparse library.
+```python
+# An example
+parser = argparse.ArgumentParser(description='My program description')
+parser.add_argument('--learning_rate', type=str, default="[1e-1]")
+parser.add_argument('--lambda_parametar', type=str, default="[2]")
+parser.add_argument('--stepovi_arr', type=str, default="[5]")
+parser.add_argument('--num_epochs', type=str, default="[1]")
+parser.add_argument('--loss_type', type=str, default="['bce']")
+parser.add_argument('--Batch_size', type=str, default="[8]")
+parser.add_argument('--net_type', type=str, default="SegNet")
+parser.add_argument('--device', type=str, default="cpu")
+parser.add_argument('--trening_location', type=str, default="trening_set_mini2/img")
+parser.add_argument('--validation_location', type=str, default="validation_set_mini2/img")
+parser.add_argument('--test_location', type=str, default="test_set_mini2/img")
+parser.add_argument('--new_location', type=str)
+parser.add_argument('--output1-path', type=str, help='Path of the local file where the Output 1 data should be written.')
+args = parser.parse_args()
+```
+
+Then, a docker image of each component should be built and it should contain all the scripts, metadata files, json, csv files needed for running the source code.  
+Components are divided into a separate folders and by positioning in gitbash in specific component folder we can build docker image of that component. Besides source code and previously mentioned files, there should aslo be a Docker file that contains .  
+
+
+
+
+
 
 ## Blueberry row detection - Training a segmentation models with custom data
 
