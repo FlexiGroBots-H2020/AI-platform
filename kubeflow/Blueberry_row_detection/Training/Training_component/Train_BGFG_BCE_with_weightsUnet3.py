@@ -4,7 +4,7 @@ from numpy import binary_repr
 import torch.utils.data.dataloader
 from torch.utils.tensorboard import SummaryWriter
 import random
-from torchsummary import summary
+from torchinfo import summary
 import os
 from print_utils import *
 from data_utils import *
@@ -13,6 +13,7 @@ from model_utils import *
 from tb_utils import *
 from metrics_utils import*
 from configUnet3 import config_func_unet3
+from configNetType import config_func_nettype
 import argparse
 # from focal_loss import FocalLoss2
 import time
@@ -40,11 +41,6 @@ def set_seed(seed):
     return torch_manual_seed, torch_manual_seed_cuda
 
 def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num_epochs, loss_type,Batch_size, net_type, device):
-
-
-    # lr = 1e-5
-    # lambda_parametri = 1
-    # stepovi = 5
 
 
     lr = lr
@@ -82,7 +78,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     segmentation_net = model_init(num_channels,num_channels_lab,img_h,img_w,zscore,net_type,device,server,GPU_list)
     segmentation_net = torch.nn.DataParallel(segmentation_net, device_ids=[0]).to(device)
 
-    # print(summary(segmentation_net,(5,512,512)))
+    print(summary(segmentation_net))
     ############################
     ### model initialization ###
     ############################
@@ -106,6 +102,8 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     global count_val
     global es_min
     global epoch_model_last_save
+    global epoch_model_best_save
+    global es_epoch_count
     epoch_list = np.zeros([epochs])
     all_train_losses = np.zeros([epochs])
     all_validation_losses = np.zeros([epochs])
@@ -126,22 +124,19 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
         index_start = 0
 
         batch_iou = torch.zeros(size=(len(train_loader.dataset.img_names),num_channels_lab*2),device=device,dtype=torch.float32)
-        print(type(loss_type))
-        print(loss_type)
-
-        loss_type = 'bce'
 
         if loss_type == 'bce':
             batch_iou_bg = torch.zeros(size=(len(train_loader.dataset.img_names),2),device=device,dtype=torch.float32)
 
 
         for input_var, target_var, batch_names_train in train_loader:
-
+            
             set_zero_grad(segmentation_net)
 
             model_output = segmentation_net.forward(input_var)
             # mask_train = torch.logical_and(mask_train[:,0,:,:],mask_train[:,1,:,:])
-            loss = loss_calc(loss_type,criterion,model_output,target_var,num_channels_lab,use_mask)
+            
+            loss = loss_calc(loss_type,criterion,model_output,target_var.to(device),num_channels_lab,use_mask)
             loss.backward()
 
             optimizer.step()  # mnozi sa grad i menja weightove
@@ -233,7 +228,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
 
             model_output = segmentation_net.forward(input_var)
             # mask_val = torch.logical_and(mask_val[:,0,:,:],mask_val[:,1,:,:])
-            val_loss = loss_calc(loss_type,criterion,model_output,target_var, num_channels_lab ,use_mask)
+            val_loss = loss_calc(loss_type,criterion,model_output,target_var.to(device), num_channels_lab ,use_mask)
 
             validation_losses.append(val_loss.data)
 
@@ -297,23 +292,26 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
 
         tb_add_epoch_losses(tb,train_losses,validation_losses,epoch)
 
-        early_stop = early_stopping(epoch, val_loss_es, all_validation_losses, es_check, \
-            segmentation_net, save_model_path, save_checkpoint_freq, ime_foldera_za_upis,es_min,epoch_model_last_save,es_epoch_count,save_best_model,early_stop_flag,lr,stepovi,lambda_parametri,loss_type,net_type,batch_size)
+        early_stop, es_min, es_epoch_count, epoch_model_last_save,epoch_model_best_save, = early_stopping(epoch, val_loss_es, all_validation_losses, es_check, \
+            segmentation_net, save_model_path, save_checkpoint_freq, ime_foldera_za_upis,es_min,epoch_model_last_save,es_epoch_count,save_best_model,early_stop_flag,lr,stepovi,lambda_parametri,loss_type,net_type,batch_size, epoch_model_best_save)
         if early_stop:
             break
 
     ##### upitno da li je neophodno #####
     if not(early_stop):
         fully_trained_model_saving(segmentation_net,save_model_path,epoch,ime_foldera_za_upis,lr,stepovi,lambda_parametri,loss_type,net_type,batch_size)
-    #####################################
+    ######################################
     if server:
         torch.cuda.empty_cache()
 
     post_training_prints(ime_foldera_za_upis)
-    plt.figure(),plt.plot(all_train_losses),plt.title("Loss per epoch for UNet"),plt.plot(all_validation_losses), plt.legend(["Train loss","Validation loss"])
+    
+    plt.figure(),plt.plot(all_train_losses),plt.title("Loss per epoch for UNet++"),plt.plot(all_validation_losses), plt.legend(["Train loss","Validation loss"])
+    plt.savefig(logs_path + "/model_loss_training_unet_epochs_"+str(epochs)+"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+".png")
+    # ToDo: Implement for different models 
+    torch.save(segmentation_net,logs_path + '/fully_trained_model_epochs_' + str(epoch)+"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+ ".pt")
     plt.show()
-    plt.savefig("./model_loss_training_unet_epochs_"+str(epochs)+"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+".png")
-
+    
     np.save(logs_path + "/all_train_losses_"+str(p_index)+str(epochs)+"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+".npy", all_train_losses)
     np.save(logs_path + "/all_validation_losses_"+str(p_index)+str(epochs)+"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+".npy", all_validation_losses)
     np.save(logs_path + "/all_lr.npy", all_lr)
@@ -332,6 +330,7 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     #     IOU = run_testing(segmentation_net, test_loader, ime_foldera_za_upis, device, num_channels_lab, classes_labels,classes_labels2,
     #                  criterion_1, loss_type, tb, zscore,net_type,lr,stepovi,lambda_parametri,batch_size)
 
+    
     end_prints(ime_foldera_za_upis)
     # return IOU
     # VISUALIZE TENSORBOARD
@@ -339,12 +338,9 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     # # tensorboard --logdir=logs/Train_BCE_with_weights --host localhost
 
 if __name__ == '__main__':
-    config_func_unet3(server=False)
+    
     # lr = [1e-2,1e-3,1e-4]
-    # trening_location = "/mnt/FullSet/trening_set_mini/img"
-    # validation_location = "/mnt/FullSet/validation_set_mini/img"
-    # test_location = "/mnt/FullSet/test_set_mini/img"
-
+    
     parser = argparse.ArgumentParser(description='My program description')
     parser.add_argument('--learning_rate', type=str, default="[1e-1]")
     parser.add_argument('--lambda_parametar', type=str, default="[2]")
@@ -360,10 +356,22 @@ if __name__ == '__main__':
     parser.add_argument('--new_location', type=str)
     parser.add_argument('--output1-path', type=str, help='Path of the local file where the Output 1 data should be written.')
     args = parser.parse_args()
+    
+    
+    save_location = "random_lokacija_samo_test"
+    def do_work(save_location):
+        _ = output1_path.write(save_location + '/Data')## TODO: napisati na kojoj lokaciji je sacuvao fajlove
+
+
 
     Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output1_path, 'w') as output1_file:
-        _ = output1_file.write("empty_cache")
+    with open(args.output1_path, 'w') as output1_path:
+        do_work(save_location)
+    
+    
+    #Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
+    #with open(args.output1_path, 'w') as output1_file:
+    #    _ = output1_file.write("empty_cache")
 
 
     data_location = args.new_location
@@ -384,7 +392,9 @@ if __name__ == '__main__':
     trening_location = args.trening_location
     validation_location = args.validation_location
     test_location = args.test_location
-
+    
+    config_func_nettype(server=True,net_type=net_type)
+    
     lr = lr[1:-1]
     lr = lr.split(",")
     lr = [float(n) for n in lr]
@@ -458,3 +468,6 @@ if __name__ == '__main__':
 
     # Minimalan kod da bi postojao pipeline, ne diraj
     #empty_cache moze kasnije da sluzi da prosledjuje lokacije
+    
+    
+    

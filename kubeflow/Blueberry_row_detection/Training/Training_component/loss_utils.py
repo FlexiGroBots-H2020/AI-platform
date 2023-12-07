@@ -66,7 +66,8 @@ def loss_init(use_weights,loss_type,dataset,num_channels_lab,device,use_mask):
 def loss_calc(loss_type ,criterion ,model_output ,target_var ,num_channels_lab = 2, use_mask = True): ### num_channels_lab = 2 u slucaju kada imamo 2 klase, bg i fg, Za Saletov slucaj to ce biti 7
                                                                                  ### Kada se koristi bce ili ce kod kog nemamo racunanje verovatnoca argument num_channels_lab nije potrebno    
     if loss_type == "bce":                                                       ### proslediti
-        loss = criterion(model_output, target_var)
+        
+        loss = criterion(model_output, target_var)        
         if use_mask:
             loss = loss[mask_train.unsqueeze(1).repeat(1,num_channels_lab,1,1)]
             loss = loss.mean()

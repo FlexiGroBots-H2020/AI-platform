@@ -23,32 +23,32 @@ def get_args(phase,net_type):
         if phase == 'test':
             json_path = r"config_test_Unet3.json"
         else:
-            json_path = r"config_Unet3.json"
+            json_path = r"config_nettype_UNet3.json"
     elif net_type == "UNet++":
         if phase == 'test':
             json_path = r"config_test.json"
         else:
-            json_path = r"config.json"
+            json_path = r"config_nettype_UNet++.json"
     elif net_type == "SegNet":
         if phase == 'test':
             json_path = r"config_test.json"
         else:
-            json_path = r"config_SegNet.json"
+            json_path = r"config_nettype_SegNet.json"
     elif net_type == "PSPNet":
         if phase == 'test':
             json_path = r"config_test.json"
         else:
-            json_path = r"config_PSPNet.json"
+            json_path = r"config_nettype_PSPNet.json"
     elif net_type == "UperNet":
         if phase == 'test':
-            json_path = r"config_test.json"
+            json_path = r"config_nettype_test.json"
         else:
-            json_path = r"config_UperNet.json"
+            json_path = r"config_nettype_UperNet.json"
     elif net_type == "DUC_HDCNet":
         if phase == 'test':
-            json_path = r"config_test.json"
+            json_path = r"config_nettype_test.json"
         else:
-            json_path = r"config_DUCHDCNet.json"
+            json_path = r"config_nettype_DUC_HDCNet.json"
     else:
         print('greska:')
         print(net_type)
@@ -152,7 +152,7 @@ class AgroVisionDataSet(Dataset):
         
         if self.binary:
             label = torch.from_numpy(np.ascontiguousarray(
-                np.load(os.path.join(self.root_dir[:-3],'label','label_'+ img_name+ self.data_format), allow_pickle=False).astype(
+                np.load(os.path.join(self.root_dir[:-4],'label','label_'+ img_name+ self.data_format), allow_pickle=False).astype(
                     np.float32))).to(self.device)
             
             label = torch.tensor(label.unsqueeze(0))
@@ -160,7 +160,7 @@ class AgroVisionDataSet(Dataset):
             print("Error")
             sys.exit(0)
             
-        
+
         return img.to(device), label.to(device), img_name
 
 

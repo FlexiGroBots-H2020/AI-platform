@@ -75,24 +75,27 @@ def optimizer_init(segmentation_net,lr,weight_decay,scheduler_lr,lambda_parametr
 
 def early_stopping(epoch,val_loss_es,all_validation_losses,es_check,segmentation_net, save_model_path,\
      save_checkpoint_freq,ime_foldera_za_upis,es_min,epoch_model_last_save,es_epoch_count,save_best_model,\
-         early_stop,lr,stepovi,lambda_parametri,loss_type,net_type,batch_size):
+         early_stop,lr,stepovi,lambda_parametri,loss_type,net_type,batch_size,epoch_model_best_save):
     val_loss_es[epoch] = all_validation_losses[epoch]
     if val_loss_es[epoch]< es_min:
         es_min = val_loss_es[epoch]
         es_epoch_count = 0
         save_best_model = True
-    elif val_loss_es[epoch] > es_min:
+    elif val_loss_es[epoch] >= es_min:
         es_epoch_count += 1
         save_best_model = False
     if es_epoch_count == es_check:
         early_stop = True
+    else:
+        early_stop = False
 
 
     if save_best_model:
-        torch.save(segmentation_net.module.state_dict(), (save_model_path + 'trained_model_best_epoch_' + str(int(epoch_model_last_save))+"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+  ".pt"))
-        if os.path.exists(save_model_path + 'trained_model_best_epoch_' + str(int(epoch_model_last_save)) +"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+ ".pt"):
-            os.remove(save_model_path + 'trained_model_best_epoch_' + str(int(epoch_model_last_save)) +"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+ ".pt")
-        epoch_model_last_save = int(epoch / save_checkpoint_freq)
+        if os.path.exists(save_model_path + 'trained_model_best_epoch_' + str(int(epoch_model_best_save)) +"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+ ".pt"):
+            os.remove(save_model_path + 'trained_model_best_epoch_' + str(int(epoch_model_best_save)) +"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+ ".pt")
+        torch.save(segmentation_net.module.state_dict(), (save_model_path + 'trained_model_best_epoch_' + str(int(epoch))+"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+  ".pt"))
+        
+        epoch_model_best_save = int(epoch)
         ispis = ("Model BEST saved at path>> " + save_model_path + 'trained_model_best_epoch_' + str(epoch) +"_lr_"+str(lr)+"_step_"+str(stepovi)+"_Lambda_parametar_"+str(lambda_parametri)+"_loss_type_"+str(loss_type)+"_arhitektura_"+str(net_type)+"_batch_size_"+str(batch_size)+ ".pt")
         print(ispis)
         upisivanje(ispis, ime_foldera_za_upis)
@@ -109,17 +112,19 @@ def early_stopping(epoch,val_loss_es,all_validation_losses,es_check,segmentation
         ispis = ("Model ES saved at path>> " + save_model_path + 'trained_model_ES_epoch' + str(epoch) + ".pt")
         print(ispis)
         upisivanje(ispis, ime_foldera_za_upis)
-        return early_stop
+        return early_stop, es_min, es_epoch_count, epoch_model_last_save, epoch_model_best_save
 
-    if (epoch / save_checkpoint_freq).is_integer():
+    if (np.mod(epoch / save_checkpoint_freq,save_checkpoint_freq)).is_integer():
         torch.save(segmentation_net.module.state_dict(), (save_model_path + 'trained_model_epoch' + str(epoch) + ".pt"))
-        if os.path.exists(save_model_path + 'trained_model_epoch' + str(int(epoch_model_last_save)) + ".pt"):
-            os.remove(save_model_path + 'trained_model_epoch' + str(int(epoch_model_last_save)) + ".pt")
+        # if os.path.exists(save_model_path + 'trained_model_epoch' + str(int(epoch_model_last_save)) + ".pt"):
+        #     os.remove(save_model_path + 'trained_model_epoch' + str(int(epoch_model_last_save)) + ".pt")
         epoch_model_last_save = int(epoch / save_checkpoint_freq)
         ispis = ("Model saved at path>> " + save_model_path + 'trained_model_epoch' + str(epoch) + ".pt")
         print(ispis)
         upisivanje(ispis, ime_foldera_za_upis)
-        return early_stop
+        return early_stop, es_min, es_epoch_count, epoch_model_last_save, epoch_model_best_save
+    else:
+        return early_stop, es_min, es_epoch_count, epoch_model_last_save, epoch_model_best_save
 
 
 
