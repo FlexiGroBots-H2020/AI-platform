@@ -25,7 +25,7 @@ print("========================")
 #TODO: download odakle da vuce podatke
 #TODO: download gde da cuva na HDD
 
-if os.path.isdir(save_location + '/DataTest'):
+if os.path.isdir(save_location + '/Data'):
     print("========================Data already exists========================")
 else:
     print("========================Data doesn't exists========================")
@@ -39,7 +39,7 @@ else:
 # Minimalan kod da bi postojao pipeline, ne diraj
 #empty_cache moze kasnije da sluzi da prosledjuje lokacije
 def do_work(save_location):
-    _ = output1_path.write(save_location + '/DataTest')## TODO: napisati na kojoj lokaciji je sacuvao fajlove
+    _ = output1_path.write(save_location + '/Data')## TODO: napisati na kojoj lokaciji je sacuvao fajlove
 
 
 
