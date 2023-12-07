@@ -4,10 +4,12 @@ import numpy as np
 import torch
 import torch.utils.data.dataloader
 import segmentation_models_pytorch as smp
-import os
+import os,glob
 import copy
 import argparse
+print("cv2 se importuje")
 import cv2
+print("cv2 importovan")
 from pathlib import Path
 ###########################################
 from Unet_LtS import UNet3
@@ -18,7 +20,7 @@ from DUC_HDCNet import DeepLab_DUC_HDC
 # from Train_BGFG_BCE_with_weightsUnet3 import main
 # from print_utils import *
 # from data_utils import *
-# from loss_utils import *
+# from loss_utils import *              
 # from model_utils import *
 # from tb_utils import *
 # from metrics_utils import*
@@ -280,7 +282,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
 
     # final_mask[y0 - row_pad:y_end + row_pad, x_start - column_pad:x_end + column_pad] = copy.deepcopy(image)
     driver = gdal.GetDriverByName('GTiff')
-    tmp_raster = driver.Create(os.path.join(save_final_GeoTiff_pth,'unetpp_test_parcel_belanovica.tif'), final_mask.shape[1], final_mask.shape[0], 1, gdal.GDT_Byte)
+    tmp_raster = driver.Create(os.path.join(save_final_GeoTiff_pth,'unetpp_test_parcel_belanovica.tiff'), final_mask.shape[1], final_mask.shape[0], 1, gdal.GDT_Byte)
     tmp_raster.SetGeoTransform(geotransform)
     tmp_raster.SetProjection(projection)
     srcband = tmp_raster.GetRasterBand(1)
@@ -289,7 +291,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
     print("Postprocessing block ended")
 
     
-    geotiffff = gdal.GetDriverByName('GTiff').Create(os.path.join(save_final_colored_GeoTiff_pth,'rgb_masked_with_red_belanovica.tif'),final_mask.shape[1], final_mask.shape[0], 3, gdal.GDT_Byte)
+    geotiffff = gdal.GetDriverByName('GTiff').Create(os.path.join(save_final_colored_GeoTiff_pth,'unetpp_test_rgb_masked_with_red_belanovica.tiff'),final_mask.shape[1], final_mask.shape[0], 3, gdal.GDT_Byte)
 
     geotiffff.SetGeoTransform(geotransform)    # specify coords
     srs = osr.SpatialReference()            # establish encoding
@@ -415,15 +417,12 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
 #     srcband.FlushCache()
 #     print("Postprocessing block ended")
 
-def new_print_function(a):
-    print(a)
-
 def main(model_path, net_type, device, input_files_type=None):
-    new_print_function("main metod")
+    
     # Loading test rasters
-    #main_path = "/home/tloken/biosens/borovnice"
+    
     main_path = "/mnt"
-    border_shp = main_path + "/DataTest/shp/TestParcel.shp"
+    border_shp = glob.glob(main_path + "/DataTest/shp/*.shp")[0]
 
     if input_files_type == "npy":
         in_test_raster_r = main_path + "/DataTest/kanali_npy/test_ch_red_croped.npy"
@@ -438,12 +437,20 @@ def main(model_path, net_type, device, input_files_type=None):
         ch_rededge = np.load(in_test_raster_rededge)
         #cropped_mask = r'/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/shp/cropped_mask.npy'
         cropped_mask = main_path + "/DataTest/kanali_npy/cropped_mask.npy" 
+        
+        
+    
     else:
-        in_raster_r = main_path + "/DataTest/GeoTiffs/Belanovica2_processed_transparent_mosaic_red.tif"
-        in_raster_g = main_path + "/DataTest/GeoTiffs/Belanovica2_processed_transparent_mosaic_green.tif"
-        in_raster_b = main_path + "/DataTest/GeoTiffs/Belanovica2_processed_transparent_mosaic_blue.tif"
-        in_raster_rededge = main_path + "/DataTest/GeoTiffs/Belanovica2_processed_transparent_mosaic_red edge.tif"
-        in_raster_nir = main_path + "/DataTest/GeoTiffs/Belanovica2_processed_transparent_mosaic_nir.tif"
+        # in_raster_r = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_red.tif"
+        # in_raster_g = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_green.tif"
+        # in_raster_b = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_blue.tif"
+        # in_raster_rededge = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_red edge.tif"
+        # in_raster_nir = main_path + "/DataTest/GeoTiffs/Babe_registrated_corrected_transparent_mosaic_nir.tif"
+        in_raster_r = glob.glob(main_path + "/DataTest/GeoTiffs/*red.tif")[0]
+        in_raster_g = glob.glob(main_path + "/DataTest/GeoTiffs/*green.tif")[0]
+        in_raster_b = glob.glob(main_path + "/DataTest/GeoTiffs/*blue.tif")[0]
+        in_raster_rededge = glob.glob(main_path + "/DataTest/GeoTiffs/*edge.tif")[0]
+        in_raster_nir = glob.glob(main_path + "/DataTest/GeoTiffs/*nir.tif")[0]
         r = gdal.Open(in_raster_r)
         g = gdal.Open(in_raster_g)
         b = gdal.Open(in_raster_b)
@@ -574,10 +581,11 @@ def main(model_path, net_type, device, input_files_type=None):
     save_final_GeoTiff_pth = main_path + "/DataTest/final_results_folder"
     if os.path.isdir(save_final_GeoTiff_pth)==False:
         os.mkdir(save_final_GeoTiff_pth)
-    save_final_colored_GeoTiff_pth = main_path + "/DataTest/final_results_folder"
+    save_final_colored_GeoTiff_pth = main_path + "/DataTest/final_results_folder/"
     save_final_shp_pth = main_path + "/DataTest/final_results_folder"
     postprocessing_block(stacked_geotiffs_npy,full_stacked_geotiffs,y0,y1,x0,x1,final_mask, geo_transform,wkt_raster_proj,load_pred_data_pth, save_final_GeoTiff_pth, save_final_colored_GeoTiff_pth, save_final_shp_pth)
-
+    
+    return save_final_colored_GeoTiff_pth
 
 
 if __name__ == '__main__':
@@ -600,8 +608,9 @@ if __name__ == '__main__':
     model_path = args.model_path
     net_type = args.net_type
     device = args.device
-    main(model_path = model_path, net_type = net_type, device=device)
+    output = main(model_path = model_path, net_type = net_type, device=device,input_files_type=None)
     Path(args.output1_path).parent.mkdir(parents=True, exist_ok=True)
-    print('3')
+    
+    print('output: ',output)
     with open(args.output1_path, 'w') as output1_file:
-        _ = output1_file.write("empty_cache")
+        _ = output1_file.write(output)

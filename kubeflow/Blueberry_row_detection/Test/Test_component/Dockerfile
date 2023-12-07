@@ -18,7 +18,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install torch torchvision -f https://download.pytorch.org/whl/cu111/torch_stable.html
 
 # Install other libraries
-RUN pip3 install numpy
+RUN pip3 install --upgrade numpy
 RUN pip3 install opencv-python-headless
 RUN pip3 install segmentation-models-pytorch
 RUN pip3 install matplotlib
