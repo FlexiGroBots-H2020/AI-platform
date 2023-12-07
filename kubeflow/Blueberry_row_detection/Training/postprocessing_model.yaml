@@ -10,7 +10,7 @@ inputs:
 
 implementation:
   container:
-    image: ghcr.io/flexigrobots-h2020/training_post-processing_component:latest
+    image: ghcr.io/flexigrobots-h2020/rebuild_postprocessing_component:latest
     command: [
       python, PostProcessing.py,
       

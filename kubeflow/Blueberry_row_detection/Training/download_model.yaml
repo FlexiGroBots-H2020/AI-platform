@@ -7,7 +7,7 @@ inputs:
 - {name: save_location, type: list, description: 'save location'}
 
 outputs:
-- {name: output1-path, type: list, description: 'output'}
+- {name: output1-path, type: String, description: 'output'}
 
 implementation:
   container:

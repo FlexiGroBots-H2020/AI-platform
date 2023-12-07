@@ -10,10 +10,13 @@ inputs:
 - {name: loss_type, type: list, description: 'Lloss_type'}
 - {name: Batch_size, type: list, description: 'Batch_size'}
 
-- {name: trening_location, type: list, description: 'trening_location'}
-- {name: validation_location, type: list, description: 'validation_location'}
-- {name: test_location, type: list, description: 'test_location'}
-- {name: new_location, type: list, description: 'test_location'}
+- {name: net_type, type: String, description: 'Type of Network that will be run'}
+- {name: device, type: String, description: 'will torch run on cuda (gpu) or cpu'}
+
+- {name: trening_location, type: String, description: 'trening_location'}
+- {name: validation_location, type: String, description: 'validation_location'}
+- {name: test_location, type: String, description: 'test_location'}
+- {name: new_location, type: String, description: 'new_location'}
 
 outputs:
 - {name: output1-path, type: list, description: 'Learning rate'}
@@ -21,7 +24,7 @@ outputs:
 
 implementation:
   container:
-    image: ghcr.io/flexigrobots-h2020/training_model-training_component:latest
+    image: ghcr.io/flexigrobots-h2020/blueberry_rebuild_test1:latest
     command: [
       python, Train_BGFG_BCE_with_weightsUnet3.py,
       
@@ -42,6 +45,12 @@ implementation:
       
       --Batch_size,
       {inputValue: Batch_size},
+      
+      --net_type,
+      {inputValue: net_type},
+      
+      --device,
+      {inputValue: device},
       
       --trening_location,
       {inputValue: trening_location},
