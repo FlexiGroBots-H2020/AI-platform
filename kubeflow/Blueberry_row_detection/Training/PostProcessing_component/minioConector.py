@@ -1,6 +1,7 @@
 import os
 from minio import Minio
 import glob
+import urllib3
 
 class minioConector:
     def __init__(self):
@@ -15,6 +16,17 @@ class minioConector:
 #         self.host = os.getenv('MINIO_HOST')
 #         self.access = os.getenv('MINIO_ACCESS_KEY')
 #         self.secret =os.getenv('MINIO_SECRET_KEY')
+        
+        _http = urllib3.PoolManager(
+            timeout=10,
+            maxsize=10,
+            retries = urllib3.Retry(
+                total=3,
+                backoff_factor=0.2,
+                status_forcelist=[500, 502, 503, 504]
+            )
+        )
+
         print(self.host)
         print(self.access)
         print(self.secret)
