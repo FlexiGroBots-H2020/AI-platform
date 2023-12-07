@@ -1,4 +1,3 @@
-tensorflow
 matplotlib
 numpy
 torchsummary
@@ -11,3 +10,5 @@ opencv-python
 segmentation_models_pytorch
 scikit-learn
 scipy
+tensorboard
+torchinfo
