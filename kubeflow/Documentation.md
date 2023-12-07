@@ -37,19 +37,36 @@ args = parser.parse_args()
 ```
 
 Then, a docker image of each component should be built and it should contain all the scripts, metadata files, json, csv files needed for running the source code.  
-Components are divided into a separate folders and by positioning in gitbash in specific component folder we can build docker image of that component. Besides source code and previously mentioned files, there should aslo be a Docker file that contains commands for running the component in a proper way.  
+Components are divided into a separate folders and by positioning in gitbash in specific component folder we can build docker image of that component. Besides source code and previously mentioned files, there should aslo be a Docker file 
 
-The docker build command is used to build a Docker image from a specified Dockerfile and context. Here is the basic syntax:
-```bash
+The docker build command is used to build a Docker image from a specified Dockerfile that contains commands for running the component in a proper way as well as setting the component environment. Here is the basic syntax:
+```python
 docker build [OPTIONS] PATH | URL | -
 ```
 
-Building a component:
+Example for building a test component:
 ```python
 docker build -t rebuild_test_component .
 ```
-the docker tag command is used to assign a tag to an image. Tags provide a way to give a meaningful and human-readable name to a specific version or variant of an image. Tags are often used to version container images or differentiate between different configurations of the same application.
+The docker tag command is used to assign a tag to an image. Tags provide a way to give a meaningful and human-readable name to a specific version or variant of an image. Tags are often used to version container images or differentiate between different configurations of the same application.
+```python
+docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+```
+Example:
+```python
+docker tag rebuild_test_component ghcr.io/flexigrobots-h2020/rebuild_test_component
+```
 
+The docker push command is used to push a Docker image or a set of images to a container registry, making them available for others to pull and use. The basic syntax for the docker push command is as follows:
+```python
+docker push [OPTIONS] NAME[:TAG]
+```
+
+Example:
+
+```python
+docker push ghcr.io/flexigrobots-h2020/rebuild_test_component
+```
 
 
 
