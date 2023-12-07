@@ -37,9 +37,18 @@ args = parser.parse_args()
 ```
 
 Then, a docker image of each component should be built and it should contain all the scripts, metadata files, json, csv files needed for running the source code.  
-Components are divided into a separate folders and by positioning in gitbash in specific component folder we can build docker image of that component. Besides source code and previously mentioned files, there should aslo be a Docker file that contains .  
+Components are divided into a separate folders and by positioning in gitbash in specific component folder we can build docker image of that component. Besides source code and previously mentioned files, there should aslo be a Docker file that contains commands for running the component in a proper way.  
 
+The docker build command is used to build a Docker image from a specified Dockerfile and context. Here is the basic syntax:
+```bash
+docker build [OPTIONS] PATH | URL | -
+```
 
+Building a component:
+```python
+docker build -t rebuild_test_component .
+```
+the docker tag command is used to assign a tag to an image. Tags provide a way to give a meaningful and human-readable name to a specific version or variant of an image. Tags are often used to version container images or differentiate between different configurations of the same application.
 
 
 
