@@ -204,6 +204,7 @@ Train component initialization
 ```
 
 Limiting number of device that could be used, cache staleness option
+
 Postprocessing component initialization
 
 ```python
@@ -238,42 +239,39 @@ pipeline = client.pipeline_uploads.upload_pipeline(filepath, name=name)
 
 New pipeline will be created:
 
-image
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/392b98cd8b31544cb182f287b6b174ac422e46f2/new%20notebook%203.png)
 
+To create new pipeline run, experiment must be specified and previously created
 
-To create new pipeline run experiment must be specified and previously created
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/ced5d9e74fdc400857c3f69300c2528771945303/runs%201.png)
 
+Specify name and description of the experiment
+In the last 5 runs section there is a preview of last 5 runs statuses:
 
-image
-
-
-Create new experiment (KFP) >create experiment >specify name and description of experiment
-In the Last 5 runs section there is a preview of last 5 runs statuses:
-
-Last five runs images explained
-
+![Example_images](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/c19e03585d997853d4edface6ed62ff38f4520b8/statuses.png)
 
 Pipeline structure is shown in the figure below. 
 
-Image pipeline structure
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/bd5147d6db574cf339823b4e5370437ad08fef67/runs%202.png)
 
 
 Download component - used for downloading data from data storage (in our case from minIO bucket) to the local Kubeflow volume.
+
 Main component - used for executing learning procedures, training, testing scripts, inference services or any pipeline that is supposed to run on the AI platform.
+
 Push component - used for uploading results to the data storage (also minIO in our case).
 
 Additional components - besides these three basic pipeline components, there could be additional components or branches of pipeline that could be used for data visualization, results evaluation, explainable AI or simply for different types of data processing etc.
 
-
-Start a run image
-
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/137469209187ed51160448666c2d8057ffcfd58c/runs%203.png)
 
 Choose a previously generated experiment and click “use this experiment”. Then you can start the run
 
-choose an experimen image
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/1b65ab920023698d568256b8ac495259c661721c/runs%204.png)
 
 New run will be shown in Runs section
 
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/0b7b6050f016b6adbb389f67283f7fde43463ec4/runs%205.png)
 
 
 
