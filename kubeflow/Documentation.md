@@ -37,36 +37,191 @@ args = parser.parse_args()
 ```
 
 Then, a docker image of each component should be built and it should contain all the scripts, metadata files, json, csv files needed for running the source code.  
-Components are divided into a separate folders and by positioning in gitbash in specific component folder we can build docker image of that component. Besides source code and previously mentioned files, there should aslo be a Docker file 
+Components are divided into a separate folders and by positioning in gitbash in specific component folder we can create docker image of that component. 
+When creating a Docker image, you need to create a Dockerfile, which is a script that contains a set of instructions for building a Docker image. The Dockerfile specifies the base image, sets up the environment, copies files into the image, and defines the commands to run when the container starts.
 
-The docker build command is used to build a Docker image from a specified Dockerfile that contains commands for running the component in a proper way as well as setting the component environment. Here is the basic syntax:
+Docker file example:
 ```python
-docker build [OPTIONS] PATH | URL | -
-```
+FROM python:3.8
+WORKDIR /pipelines
+COPY requirements.txt /pipelines
 
-Example for building a test component:
-```python
-docker build -t rebuild_test_component .
-```
-The docker tag command is used to assign a tag to an image. Tags provide a way to give a meaningful and human-readable name to a specific version or variant of an image. Tags are often used to version container images or differentiate between different configurations of the same application.
-```python
-docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
-```
-Example:
-```python
-docker tag rebuild_test_component ghcr.io/flexigrobots-h2020/rebuild_test_component
-```
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6  -y
 
-The docker push command is used to push a Docker image or a set of images to a container registry, making them available for others to pull and use. The basic syntax for the docker push command is as follows:
-```python
-docker push [OPTIONS] NAME[:TAG]
+
+RUN pip install -r requirements.txt
+COPY . /pipelines
+
+RUN chmod +x /pipelines/Train_BGFG_BCE_with_weightsUnet3.py
+
+ENTRYPOINT ["python"]
+CMD ["/pipelines/Train_BGFG_BCE_with_weightsUnet3.py"]
+
 ```
 
-Example:
+Creating docker images involves the following steps/commands:
+
+1. Docker build
+      The docker build command is used to build a Docker image from a specified Dockerfile that contains commands for running the component in a proper way as well as setting the component environment. Here is the basic syntax:
+      ```python
+      docker build [OPTIONS] PATH | URL | -
+      ```
+      Example for building a test component:
+      ```python
+      docker build -t rebuild_test_component .
+      ```
+
+2. Docker tag
+      The docker tag command is used to assign a tag to an image. Tags provide a way to give a meaningful and human-readable name to a specific version or variant of an image. Tags are often used to version container images or differentiate between different configurations of the same application.
+      ```python
+      docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+      ```
+      Example:
+      ```python
+      docker tag rebuild_test_component ghcr.io/flexigrobots-h2020/rebuild_test_component
+      ```
+
+3. Docker push
+      The docker push command is used to push a Docker image or a set of images to a container registry, making them available for others to pull and use. The basic syntax for the docker push command is as follows:
+      ```python
+      docker push [OPTIONS] NAME[:TAG]
+      ```
+      Example:
+      ```python
+      docker push ghcr.io/flexigrobots-h2020/rebuild_test_component
+      ```
+
+After these steps, in the our Project Github packages section, an inastance will be created with the previously assigned tag.
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/6883f02980ba7cb51a5e4a58b09173587db4111f/package%20test%20rebuild.png)
+It is very important to change package visibility after its initializaion. By default this parameter is set on private, but in order for package/image to be available/visible for our Kubeflow pipelines it should be changed to public. After saving the changes, building and pushing all the necesary images, everything is ready for creating our custom pipelines within the Kubeflow.
+
+### 2. Creating Volume
+In Kubelow, you can use volumes to persist and share data between different components of your applications. Volumes in Kubernetes are used to store data independently of the containers running in the pods
+
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/ced1f14b3d82aca518c6043be87f71e4f5eee241/volumes%20all.png)
+
+Creating New Volume
+
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/ced1f14b3d82aca518c6043be87f71e4f5eee241/volume%20image.png)
+
+The user should specify name and size, and the rest should be set by default.
+
+
+### 3. Pipeline generation:
+
+Within this section we will first address creating creating the Notebook where the pipelines will be configured.
+
+![Example_images](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/663d07839b3e2c8b432147fee522b624c4a81ba4/notebooks%20all.png)
+
+
+Set Notebook name and choose the JupyterLab environment. The name must be in lower cases and words should be separated with dashes.  
+
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/663d07839b3e2c8b432147fee522b624c4a81ba4/new%20notebook%201.png)
+
+Specify Workplace Volume - Volume that will be mounted in your home directory.
+
+It is possible to attach already existing Volume or to create new one
+If the new Volume is created, there will be automatically created folder where all the components of pipeline should be stored/uploaded
+
+Specify Data Volume - Volume that will be mounted in your home directory.
+
+It is possible to attach already existing Volume or to create new one
+
+![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/663d07839b3e2c8b432147fee522b624c4a81ba4/new%20notebook%202.png)
+
+
+After that the notebook is created
+
+In the notebook there should be .yaml files for each component and one .ipynb file that will connect them all.
+
+Example
+
+Components: 
+download_model.yaml
+train_model5.yaml
+postprocessing_model.yaml
+
+Creation of .yaml files
+(for later…)
+
+FullPipeline.ipynb - connects each component and their mutual outputs and inputs (Output of download component with train components input.
+
+Run the full pipeline cell
+```python
+source code
+```
+ 
+It’s important to specify the name of a volume we are attached to our pipeline, as well as to initialize each component from their respective .yaml file.
+
+Download component initialization
+```python
+
+```
+
+Train component initialization
 
 ```python
-docker push ghcr.io/flexigrobots-h2020/rebuild_test_component
+
 ```
+
+Limiting number of device that could be used, cache staleness option
+Postprocessing component initialization
+
+```python
+
+```
+
+Uploading custom pipeline to Kubeflow Pipelines section by running cell:
+
+```python
+
+```
+
+New pipeline will be created:
+
+image
+
+
+To create new pipeline run experiment must be specified and previously created
+
+
+image
+
+
+Create new experiment (KFP) >create experiment >specify name and description of experiment
+In the Last 5 runs section there is a preview of last 5 runs statuses:
+
+Last five runs images explained
+
+
+Pipeline structure is shown in the figure below. 
+
+Image pipeline structure
+
+
+Download component - used for downloading data from data storage (in our case from minIO bucket) to the local Kubeflow volume.
+Main component - used for executing learning procedures, training, testing scripts, inference services or any pipeline that is supposed to run on the AI platform.
+Push component - used for uploading results to the data storage (also minIO in our case).
+
+Additional components - besides these three basic pipeline components, there could be additional components or branches of pipeline that could be used for data visualization, results evaluation, explainable AI or simply for different types of data processing etc.
+
+
+Start a run image
+
+
+Choose a previously generated experiment and click “use this experiment”. Then you can start the run
+
+choose an experimen image
+
+New run will be shown in Runs section
+
+
+
+
+
+
+
 
 
 
@@ -91,7 +246,7 @@ These docker images were pushed to the project GitHub repo and can be found in [
 
 ![Example Image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/6701f1114db73a3cd8eacb597b8d932bd690e50d/packages.png)
 
-An IPYNB file is also necessary and it is included in the same folders. As we mentioned in the first section this file is essential for connecting individual components. It consists of at least two major cells. In the first one it’s always important to check volume name in the code and change it to match with corresponding volume:
+An IPYNB file is also necessary and it is included in the same folders. This file is essential for connecting individual components. It consists of at least two major cells. In the first one it’s always important to check volume name in the code and change it to match with corresponding volume:
 
 ![Example Image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/6701f1114db73a3cd8eacb597b8d932bd690e50d/volumes_names.png)
 
