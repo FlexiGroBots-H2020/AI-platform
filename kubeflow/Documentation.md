@@ -131,51 +131,109 @@ It is possible to attach already existing Volume or to create new one
 ![Example_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/663d07839b3e2c8b432147fee522b624c4a81ba4/new%20notebook%202.png)
 
 
-After that the notebook is created
-
-In the notebook there should be .yaml files for each component and one .ipynb file that will connect them all.
+After that the notebook is created and the user can connect to it. In the notebook, the user should upload .yaml files for each component of the pipeline and one .ipynb file that will connect them all.
 
 Example
 
 Components: 
-download_model.yaml
-train_model5.yaml
-postprocessing_model.yaml
+* download_model.yaml
+* train_model.yaml
+* postprocessing_model.yaml
 
-Creation of .yaml files
-(for later…)
+Connecting notebook:
+* FullPipeline.ipynb - connects each component and their mutual outputs and inputs (Output of download component with train components input.
 
-FullPipeline.ipynb - connects each component and their mutual outputs and inputs (Output of download component with train components input.
-
-Run the full pipeline cell
+To create .yaml file of the whole pipeline run the notebook cells:
 ```python
-source code
+import kfp
+import kfp.dsl as dsl
+from kfp import components
+import kubernetes as k8s
+from kfp import compiler, dsl
+from kubernetes.client import V1VolumeMount
+import pprint
+import numpy as np
+
+
+@dsl.pipeline(
+    name="blueberry detection",
+    description="blueberry detection pipeline"
+)
+def full_pipeline(size: str="2Gi"):
+    
+    vop = dsl.PipelineVolume(
+        pvc="biosens-volume-main", # change with the corresponding volume name #
+        name="biosens-volume-main",
+    )
+
+    download_component = kfp.components.load_component_from_file('download_model.yaml')
+    train_model = kfp.components.load_component_from_file('train_model.yaml')
+    postprocessing_model = kfp.components.load_component_from_file('postprocessing_model.yaml')
+
 ```
  
 It’s important to specify the name of a volume we are attached to our pipeline, as well as to initialize each component from their respective .yaml file.
 
 Download component initialization
 ```python
-
+    download_component_task = download_component(
+        "blueberry-full", # minIO bucket where the data is storade
+        "/mnt"
+        ).add_pvolumes({"/mnt": vop})
+    download_component_task.execution_options.caching_strategy.max_cache_staleness = "P0D" # avoiding caching
 ```
 
 Train component initialization
 
 ```python
-
+    train_model_task = train_model(
+        [1e-3], #'Learning rate'
+        [1], #'Lambda parametar'
+        [5], #'Stepovi arr'
+        [8], #'num_epochs'
+        ['bce'], #'Lloss_type'
+        [2], #'Batch_size'
+        "UNet++", #'Type of Network that will be run. Available model architectures: UNet3, UNet++, SegNet, PSPNet, UperNet, DUC_HDCNet'
+        "cuda", #'will torch run on cuda (gpu) or cpu'
+        "/mnt/FullSet/trening_set/img/", # 'trening_location'
+        "/mnt/FullSet/validation_set/img/", #'validation_location'
+        "/mnt/FullSet/test_set/img/", #'test_location'
+        # "/mnt" # if download is pruned this should replace the line bellow
+        download_component_task.output
+        ).add_pvolumes({"/mnt": vop})
 ```
 
 Limiting number of device that could be used, cache staleness option
 Postprocessing component initialization
 
 ```python
-
+    train_model_task.set_gpu_limit(1)
+    train_model_task.execution_options.caching_strategy.max_cache_staleness = "P0D" # avoiding caching
+    postprocessing_model = postprocessing_model(
+        "/mnt/logs/Train_BGFG_BCE_with_weightsUNet++/", # path where the logs will be stored during the training
+        "blueberry-results", # output minIO bucket for storing results
+        train_model_task.output
+        ).add_pvolumes({"/mnt": vop})
 ```
+
+Running the pipeline initialization:
+```python
+if __name__ == '__main__':
+    file_name = "full_nettype_pipeline.yaml" # nettype can be changed with corresponding net type in the moment of creating pipelines
+    kfp.compiler.Compiler().compile(full_pipeline, file_name)
+```
+
 
 Uploading custom pipeline to Kubeflow Pipelines section by running cell:
 
 ```python
-
+import kfp
+import random
+client=kfp.Client()
+filepath = '/home/jovyan/biosens-volume-main/' + file_name
+name = 'train_pipeline_nettype_timestamp' # nettype and timestamp can be changed with corresponding net type and time in the moment of creating pipelines
+print("Uploaded pipeline:", name)
+pipeline = client.pipeline_uploads.upload_pipeline(filepath, name=name)
 ```
 
 New pipeline will be created:
