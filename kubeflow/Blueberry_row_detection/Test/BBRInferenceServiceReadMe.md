@@ -1,4 +1,4 @@
-# Blueberry row detection - Inference service
+# Blueberry row detection - Inference service - ToDo: Update YAML and IPYNB
 
 The pipeline consists of three components or blocks. Through this pipeline we must firstly download data from the data storage (minIO), then we have to choose a part of parcel where we want to detect blueberry rows and lastly provide the detected rows back to our data storage in tif, shp and png formats, including the metrics that describe how accurate the model was. 
 
