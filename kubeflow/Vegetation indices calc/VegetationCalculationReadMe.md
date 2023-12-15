@@ -17,7 +17,7 @@ These docker images were pushed to the project GitHub repo and can be found in [
 
 An IPYNB file is also necessary and it is included in the same folders in GitHub repo. This file is essential for connecting individual components. It consists of at least two major cells. In the first one it’s always important to check volume name in the code and change it to match with corresponding volume:
 
-![notebook_volume_name]()
+![notebook_volume_name](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/c94f5e0ece48688947c913a2e655ff163881c747/notebook_volume_name.png)
 
 
 After that, the user should initialize each pipeline component by loading them from corresponding yaml files: 
