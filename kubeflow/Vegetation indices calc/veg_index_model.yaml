@@ -20,9 +20,9 @@ outputs:
 
 implementation:
   container:
-    image: ghcr.io/flexigrobots-h2020/delineation_and_zoning_component:latest
+    image: ghcr.io/flexigrobots-h2020/vegetation_ind_calc_component:latest
     command: [
-      python, delineation_and_zones_main.py,
+      python, veg_indices_calc_pipeline.py,
       
       --number_of_zones,
       {inputValue: number_of_zones},

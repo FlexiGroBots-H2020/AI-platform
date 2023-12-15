@@ -11,7 +11,7 @@ inputs:
 
 implementation:
   container:
-    image: ghcr.io/flexigrobots-h2020/delineation_push_component:latest
+    image: ghcr.io/flexigrobots-h2020/rebuild_delineation_postprocessing_component:latest
     command: [
       python, postProcessing.py,
       
