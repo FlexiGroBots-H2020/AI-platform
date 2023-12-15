@@ -3,6 +3,9 @@
 The pipeline consists of three components or blocks. Through this pipeline, as in all previous pipelines, we must firstly download data from the data storage (minIO), then we have to choose a part of parcel where we want to calculate VI maps and lastly provide the maps back to our data storage in tif or any other suitable format.
 
 #### Step 1: Creating notebook
+
+The user can create new notebook for this task, as explained in , or use already existing. 
+
 #### Step 2: Uploading yaml files for each component
 
 YAML files for this pipeline can be found in FlexiGroBots [Github](https://github.com/FlexiGroBots-H2020/AI-platform/tree/biosens/kubeflow/Vegetation%20Indices) repo in the corresponding folders under the biosens branch. Each file assigns appropriate docker image/package:
