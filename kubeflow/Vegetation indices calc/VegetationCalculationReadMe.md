@@ -84,4 +84,11 @@ pipeline = client.pipeline_uploads.upload_pipeline(filepath, name=name)
 ```
 New pipeline will be created in Kubflow pipelines section and by creating new run as explained in [here](https://github.com/FlexiGroBots-H2020/AI-platform/blob/c07ef85224c4533fd04f80b07a5ba4398e17597c/kubeflow/Documentation.md#3-pipeline-generation)
 
+Resulting tif maps stored in the minIO: 
+
+![Results_image](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/e3ab2e4c4d8703c860271dbc24710a412148cd46/rsultdd.png)
+
+These results can than be downloaded and loaded in QGIS:
+
+![NDVI_example](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/4eda0c48723e3cbaa65933192bd040735d7f28c5/ndvi.png)
 
