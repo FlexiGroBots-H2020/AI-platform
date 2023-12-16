@@ -10,7 +10,7 @@ The user can create new notebook for this task, as explained in [here](https://g
 
 YAML files for this pipeline can be found in FlexiGroBots [Github](https://github.com/FlexiGroBots-H2020/AI-platform/tree/c07ef85224c4533fd04f80b07a5ba4398e17597c/kubeflow/Vegetation%20indices%20calc) repo in the corresponding folders. Each file assigns appropriate docker image/package:
 - Download component: rebuild_delineation_download_component 
-- Test component: vegetation_ind_calc_component
+- VI calculator component: vegetation_ind_calc_component
 - PostProcessing component: rebuild_delineation_postprocessing_component.
 
 These docker images were pushed to the project GitHub repo and can be found in [packages](https://github.com/orgs/FlexiGroBots-H2020/packages) section.
