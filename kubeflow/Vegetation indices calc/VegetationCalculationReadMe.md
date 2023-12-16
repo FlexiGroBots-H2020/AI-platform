@@ -23,9 +23,9 @@ An IPYNB file is also necessary and it is included in the same folders in GitHub
 After that, the user should initialize each pipeline component by loading them from corresponding yaml files: 
 
 ```python
-download_component = kfp.components.load_component_from_file('Vegetation_indices_calculation/download_model.yaml')
-veg_ind_model = kfp.components.load_component_from_file('Vegetation_indices_calculation/veg_index_model.yaml')
-postprocessing_model = kfp.components.load_component_from_file('Vegetation_indices_calculation/postprocessing_model.yaml')
+download_component = kfp.components.load_component_from_file('download_model.yaml')
+veg_ind_model = kfp.components.load_component_from_file('veg_index_model.yaml')
+postprocessing_model = kfp.components.load_component_from_file('postprocessing_model.yaml')
 ```
 Initialization of download component:
 ```python
@@ -67,7 +67,7 @@ Running the pipeline initialization:
 
 ```python
 if __name__ == '__main__':
-    file_name = "Vegetation_indices_calculation/full_vegetation_index_pipeline.yaml"
+    file_name = "full_vegetation_index_pipeline.yaml"
     kfp.compiler.Compiler().compile(full_pipeline, file_name)
 ```
 
