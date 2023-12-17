@@ -34,7 +34,7 @@ model_dir = "/mnt/model/"
 model_name = "blueberry_row_detection_model.pt"
 model_path = model_dir + model_name
 ```
-
+This model can be uploaded manually to the notebook or downloaded from the minIO through the download component
 
 Initialization of download component:
 ```python
