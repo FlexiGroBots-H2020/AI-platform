@@ -1,4 +1,4 @@
-![image](https://github.com/FlexiGroBots-H2020/AI-platform/assets/94372215/fc1a1401-e226-4372-838c-fa234b8bb75b)# Blueberry row detection - Inference service - ToDo: Update YAML and IPYNB
+# Blueberry row detection - Inference service - ToDo: Update YAML and IPYNB
 
 The pipeline consists of three components or blocks. Through this pipeline we must firstly download data from the data storage (minIO), then we have to choose a part of parcel where we want to detect blueberry rows and lastly provide the detected rows back to our data storage in tif, shp and png formats, including the metrics that describe how accurate the model was. 
 
