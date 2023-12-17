@@ -2,6 +2,9 @@ name: Full Test Component
 description: Full Test Component
 
 inputs:
+- {name: model_path, type: list, description: 'model path'}
+- {name: net_type, type: list, description: 'net type'}
+- {name: device, type: list, description: 'device'}
 - {name: new_location, type: list, description: 'test_location'}
 
 outputs:
@@ -9,10 +12,16 @@ outputs:
 
 implementation:
   container:
-    image: ghcr.io/flexigrobots-h2020/test_full_test_component:latest
+    image: ghcr.io/flexigrobots-h2020/rebuild_test_component:latest
     command: [
       python, test_pipeline.py,
       
+      --model_path,
+      {inputValue: model_path},
+      --net_type,
+      {inputValue: net_type},
+      --device,
+      {inputValue: device},
       --new_location,
       {inputValue: new_location},
       
