@@ -11,7 +11,7 @@ outputs:
 
 implementation:
   container:
-    image: ghcr.io/flexigrobots-h2020/training_download_component:latest
+    image: ghcr.io/flexigrobots-h2020/rebuild_delineation_download_component:latest
     command: [
       python, download_data.py,
 
