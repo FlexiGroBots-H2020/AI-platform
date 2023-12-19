@@ -283,12 +283,12 @@ New run will be shown in Runs section
 
  ## Blueberry row detection - Training a segmentation models with custom data
 
-[Steps for running blueberry row detection model training](https://github.com/FlexiGroBots-H2020/AI-platform/blob/79dd7f1ceb1e73cccbb4c95da09368bbbbee5ce3/kubeflow/Blueberry_row_detection/Training/BBRTReadMe.md)
+[Steps for running blueberry row detection model training](https://github.com/FlexiGroBots-H2020/AI-platform/blob/ee8190b157c13eb15890ad94194a6b0b401d7a87/kubeflow/Blueberry_row_detection/Training/BBRTReadMe.md)
 
 
 ## Running an AutoML experiment
 
-Documentation and guidelines for running Katib/AutoML experiment, as well as the examples are provided [here](https://github.com/FlexiGroBots-H2020/AI-platform/tree/biosens/kubeflow/Katib)
+Documentation and guidelines for running Katib/AutoML experiment, as well as the examples are provided [here](https://github.com/FlexiGroBots-H2020/AI-platform/tree/ee8190b157c13eb15890ad94194a6b0b401d7a87/kubeflow/Katib)
 
 Another example of running AutoML hyperparameter search for training blueberry rows detection model is explained [here](https://github.com/FlexiGroBots-H2020/AI-platform/blob/35e3dcbf5d991c1461a63dec22a265ea2654b356/kubeflow/Katib/docker%20images/Katib-BBRowDetection/README.md). All the scripts needed for reproducing this experiment can also be found on the link above.
 
@@ -297,13 +297,13 @@ Another example of running AutoML hyperparameter search for training blueberry r
 ## Blueberry row detection - Inference service
 
 We developed an inference service pipeline for blueberry row detection using state-of-the-art deep learning models (trained using AI platform).  
-[Steps for running blueberry row detection inference service (model testing)](https://github.com/FlexiGroBots-H2020/AI-platform/blob/4dd6f52a8fe0b7625c205e08bd11f5c4d21f6d3c/kubeflow/Blueberry_row_detection/Test/BBRInferenceServiceReadMe.md).
+[Steps for running blueberry row detection inference service (model testing)](https://github.com/FlexiGroBots-H2020/AI-platform/blob/3a29eadbecf608826585986b9f3709f9687aa49f/kubeflow/Blueberry_row_detection/Test/BBRInferenceServiceReadMe.md).
 
 
 ## Vegetation index maps calculator - Inference service
 
 We developed an inference service pipeline for calculating vegetation index(VI) maps using UAV multispectral data/orthomosaics. 
-[Steps for running vegetation index maps calculator](https://github.com/FlexiGroBots-H2020/AI-platform/blob/56734173f7952229c84ecae4c572957283c545a0/kubeflow/Vegetation%20indices%20calc/VegetationCalculationReadMe.md)
+[Steps for running vegetation index maps calculator](https://github.com/FlexiGroBots-H2020/AI-platform/blob/90a38cff49f61f13e3e888f395406fea9fcf6ad0/kubeflow/Vegetation%20indices%20calc/VegetationCalculationReadMe.md)
 
 ## Delineation and zoning - Inference service
 
