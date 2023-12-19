@@ -297,7 +297,7 @@ Another example of running AutoML hyperparameter search for training blueberry r
 ## Blueberry row detection - Inference service
 
 We developed an inference service pipeline for blueberry row detection using state-of-the-art deep learning models (trained using AI platform).  
-[Steps for running blueberry row detection inference service (model testing)](https://github.com/FlexiGroBots-H2020/AI-platform/blob/4dd6f52a8fe0b7625c205e08bd11f5c4d21f6d3c/kubeflow/Blueberry_row_detection/Test/BBRInferenceServiceReadMe.md).
+[Steps for running blueberry row detection inference service (model testing)](https://github.com/FlexiGroBots-H2020/AI-platform/blob/3a29eadbecf608826585986b9f3709f9687aa49f/kubeflow/Blueberry_row_detection/Test/BBRInferenceServiceReadMe.md).
 
 
 ## Vegetation index maps calculator - Inference service
