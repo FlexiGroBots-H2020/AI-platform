@@ -179,6 +179,18 @@ def preprocessing_block(GeoTiff,Shape,save_data_pth):
     print("Test data saved")
     print("Preprocessing block ended")
 
+def pad_image(image,desired_size):
+    if len(image.shape) == 3:
+        height, width, depth = image.shape
+    else:
+        height, width = image.shape
+
+    delta_w = desired_size[0] - width
+    delta_h = desired_size[1] - height
+    top, bottom = delta_h//2, delta_h - (delta_h//2)
+    left, right = delta_w//2, delta_w - (delta_w//2)
+    color = [0,0,0]
+    return cv2.copyMakeBorder(image,top,bottom,left,right,cv2.BORDER_CONSTANT,value = color), top, bottom, left, right
 
 def test_block(load_data_pth,model_pth,save_pred_pth, net_type, device):
     print("Test block started")
@@ -205,16 +217,15 @@ def test_block(load_data_pth,model_pth,save_pred_pth, net_type, device):
     import re
     samples = os.listdir(load_data_pth)
     samples = sorted(samples, key=lambda s: int(re.search(r'\d+', s).group()))
+    sigmoid_func = torch.nn.Sigmoid()
+    
     for sample in samples:
-        img = np.load(load_data_pth + "/" + sample)
-        img = torch.tensor(img).permute(2,0,1).unsqueeze(0)
+        img_tmp = copy.deepcopy(np.load(load_data_pth + "/" + sample))
+        img = torch.tensor(img_tmp).permute(2,0,1).unsqueeze(0)
         img = img.to("cuda:0")
         pred_sample = segmentation_net(img.float()/255)
-        img_cpu = img.cpu()
-        print("unique values of input: ", np.unique(img_cpu.float()/255))
-        sigmoid_func = torch.nn.Sigmoid()
         preds_sample2 = sigmoid_func(pred_sample)
-        pred_sample_bin = (preds_sample2 > 0.2).byte()
+        pred_sample_bin = (preds_sample2 > 0.5).byte()
 
         # plt.imsave(save_pred_pth+"/pred_"+sample[:-4]+'.png',pred_sample_bin.cpu().detach().numpy()[0][0])
         np.save(save_pred_pth+"/pred_"+sample,pred_sample_bin.cpu().detach().numpy()[0][0])
@@ -259,6 +270,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
 
     # create the 3-band raster file
     
+    np.save(os.path.join(save_final_GeoTiff_pth,"detected_rows_mask.npy"),Final_prediction*255)
     final_mask[y0:y1,x0:x1] = copy.deepcopy(Final_prediction)*255
     # full_geotiff[:,:,0][final_mask//255] = 255
 
@@ -281,6 +293,7 @@ def postprocessing_block(GeoTiff,full_geotiff,y0,y1,x0,x1,final_mask, geotransfo
     
 
     # final_mask[y0 - row_pad:y_end + row_pad, x_start - column_pad:x_end + column_pad] = copy.deepcopy(image)
+    
     driver = gdal.GetDriverByName('GTiff')
     tmp_raster = driver.Create(os.path.join(save_final_GeoTiff_pth,'unetpp_test_parcel_belanovica.tiff'), final_mask.shape[1], final_mask.shape[0], 1, gdal.GDT_Byte)
     tmp_raster.SetGeoTransform(geotransform)
@@ -559,6 +572,20 @@ def main(model_path, net_type, device, input_files_type=None):
     
     stacked_geotiffs_npy = np.stack([ch_red_cropped,ch_green_cropped,ch_blue_cropped,ch_rededge_cropped,ch_nir_cropped,cropped_mask],axis = 2)
     full_stacked_geotiffs = np.stack([ch_red,ch_green,ch_blue],axis = 2)
+    patch_size = 512
+    H = np.shape(stacked_geotiffs_npy[:,:,0])[0]
+    W = np.shape(stacked_geotiffs_npy[:,:,0])[1]
+    wanted_h = (np.ceil(H/patch_size)*patch_size).astype("uint16")
+    wanted_w = (np.ceil(W/patch_size)*patch_size).astype("uint16")
+
+    stacked_geotiffs_npy, top_delta, bottom_delta, left_delta, right_delta = pad_image(stacked_geotiffs_npy,(wanted_w,wanted_h))
+    cropped_mask, top_delta, bottom_delta, left_delta, right_delta = pad_image(cropped_mask, (wanted_w, wanted_h))
+    x0_new = x0 - left_delta
+    y0_new = y0 - top_delta
+    x1_new = x1 + right_delta
+    y1_new = y1 + bottom_delta
+
+    np.save(main_path+"/DataTest/cropped_mask.npy",cropped_mask)
     save_test_data_pth = main_path + "/DataTest/test_data_folder"
     if os.path.isdir(save_test_data_pth)==False:
         os.mkdir(save_test_data_pth)
@@ -583,7 +610,7 @@ def main(model_path, net_type, device, input_files_type=None):
         os.mkdir(save_final_GeoTiff_pth)
     save_final_colored_GeoTiff_pth = main_path + "/DataTest/final_results_folder/"
     save_final_shp_pth = main_path + "/DataTest/final_results_folder"
-    postprocessing_block(stacked_geotiffs_npy,full_stacked_geotiffs,y0,y1,x0,x1,final_mask, geo_transform,wkt_raster_proj,load_pred_data_pth, save_final_GeoTiff_pth, save_final_colored_GeoTiff_pth, save_final_shp_pth)
+    postprocessing_block(stacked_geotiffs_npy,full_stacked_geotiffs,y0_new,y1_new,x0_new,x1_new,final_mask, geo_transform,wkt_raster_proj,load_pred_data_pth, save_final_GeoTiff_pth, save_final_colored_GeoTiff_pth, save_final_shp_pth)
     
     return save_final_colored_GeoTiff_pth
 
