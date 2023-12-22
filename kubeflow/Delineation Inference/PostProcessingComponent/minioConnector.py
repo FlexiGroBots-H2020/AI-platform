@@ -1,6 +1,6 @@
 import os
 from minio import Minio
-import glob
+import glob, urllib3
 
 class minioConector:
     def __init__(self):
@@ -10,6 +10,16 @@ class minioConector:
 #         self.secret ='jqFRgK!81XOt2H!'
         self.access = 'flexigrobot2020_Admin'
         self.secret = '7*v67fhM9902^P5L5@Nl'
+
+        self._http = urllib3.PoolManager(
+            timeout=10,
+            maxsize=10,
+            retries = urllib3.Retry(
+                total=3,
+                backoff_factor=0.2,
+                status_forcelist=[500, 502, 503, 504]
+            )
+        )
 
 
 #         self.host = os.getenv('MINIO_HOST')
@@ -21,7 +31,8 @@ class minioConector:
         self.connection_with_minio = Minio(self.host,
             access_key= self.access,
             secret_key=self.secret,
-            secure=True)
+            secure=True,
+            http_client=self._http)
 
 
     #Files management

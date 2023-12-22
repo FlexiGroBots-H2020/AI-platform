@@ -1,6 +1,7 @@
 import time
 import numpy as np
-import os
+import os,glob
+from datetime import datetime
 from utils_calc_zones import create_mask_from_shp_v2
 from utils_calc_zones import index_calculation_v2, vegetation_detection_v2, clusterization_of_vegetation_coverage_v2
 from utils_calc_zones import generate_decision_zones_map_with_sampling_points, sampling_points_generator
@@ -29,9 +30,17 @@ def zone_estimation(in_raster_red,
                                                                                                      in_raster_nir, 
                                                                                                      in_raster_rededge, 
                                                                                                      in_shape)
+        redovi_pth = glob.glob("/mnt/InferenceData/DataTest/logs/","*.npy")
+        mask_ROI_redovi = np.load(redovi_pth)
         mask_ROI_tmp = mask_ROI.copy()
         end = time.time()
         print('Image croping and reading of geotiff image channels ', end - start)
+        print("mask_ROI2: ", mask_ROI_redovi.shape)
+        print("mask_ROI: ", mask_ROI.shape)
+        print("mask_ROI_tmp: ", mask_ROI_tmp.shape)
+        print("R_ch: ", R_ch.shape)
+        # import sys
+        # sys.exit(0)
     except Exception as e:
         flag_info = 0
         if e.args[0] == "Raster and shapefile don't have the same projection or pixel resolution is not in meters. Input data have to satisfy both conditions.":
@@ -46,13 +55,13 @@ def zone_estimation(in_raster_red,
     else:
         # calculation of indices 28 seconds
         start = time.time()
-        ExG, CIVE, TGI, GLI, NDVI, WDRVI, MGRV, MPRI, RGBVI = index_calculation_v2(R_ch, G_ch, B_ch,NIR_ch ,RedEdge_ch, mask_ROI)
+        ExG, CIVE, TGI, GLI, NDVI, WDRVI, MGRV, MPRI, RGBVI = index_calculation_v2(R_ch, G_ch, B_ch,NIR_ch ,RedEdge_ch, mask_ROI_redovi)
         end = time.time()
         print('Calculation of indices ', end - start)
 
         # segmentation of vegetation
         start = time.time()
-        V_mask = vegetation_detection_v2(WDRVI, MGRV, mask_ROI)
+        V_mask = vegetation_detection_v2(WDRVI, MGRV, mask_ROI_redovi)
         end = time.time()
         print('Segmentation of vegetation ', end - start)
 
@@ -67,7 +76,7 @@ def zone_estimation(in_raster_red,
 
         start = time.time()
         cluster_img[:, :], num_zones, map_index, sampling_points = generate_decision_zones_map_with_sampling_points(cluster_img,
-                                                                                              mask_ROI,
+                                                                                              mask_ROI_redovi,
                                                                                               number_of_zones,
                                                                                               window_size,
                                                                                               y_start,
@@ -86,10 +95,14 @@ def zone_estimation(in_raster_red,
         stats_structure = statistics_from_map(cluster_img, num_zones, map_index, V_mask, mask_ROI, ExG, CIVE, TGI, GLI)
         end = time.time()
         print('Calculation of statistic from dec_map ', end - start)
-        folder_name = folder_name + "/TEMP/"
+        
         if not os.path.exists(folder_name):
             os.makedirs(folder_name)
-        out_tmp_shp = folder_name + "output.shp"
+        out_tmp_shp = folder_name + "output_tmp.shp"
+
+        current_datetime = datetime.now()
+        current_datetime_str = current_datetime.strftime("%H_%M-%d-%m-%Y")
+        out_shp = folder_name + "output" + current_datetime_str + ".shp"
         create_shp_multipolygon_from_raster(in_raster_red, 
                                             num_zones, 
                                             map_index, 

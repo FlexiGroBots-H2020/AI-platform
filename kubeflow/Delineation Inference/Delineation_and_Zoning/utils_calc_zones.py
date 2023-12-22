@@ -376,8 +376,21 @@ def generate_decision_zones_map_with_sampling_points(input_map,
         label_map_array[:, :, i] = (dec_map[0:y_extent, 0:x_extent] == colors_grey[i]).astype("uint8")
     
     print("generate sampling points")
-    rot_sampling_points = generate_sampling_points_v3(label_map_array, mask_map[:y_extent, :x_extent])
+    footprint3 = disk(3)
+    footprint5 = disk(5)
+    footprint5_rect = rectangle(1,5)
+    footprint5_recth = rectangle(5,1)
+    skeletonized_map = erosion(dilation(dilation(dilation(skeletonize(mask_map.astype("uint8")[:y_extent, :x_extent]),footprint3),footprint3),footprint3))
+    final_skelet = dilation(dilation(dilation(dilation(dilation(dilation(erosion(skeletonize(skeletonized_map),footprint5_recth), footprint5_rect),footprint5_rect),footprint5_rect),footprint5_recth),footprint5_recth),footprint5_recth)
+
+    rot_sampling_points = generate_sampling_points_v3(label_map_array,np.array(final_skelet))
     rot_sampling_points = np.asarray(rot_sampling_points)
+    print(rot_sampling_points)
+    # import sys
+    # sys.exit(0)
+    # rot_sampling_points = generate_sampling_points_v3(label_map_array, mask_map[:y_extent, :x_extent])
+    
+    
     sampling_points = []
     
     for i in range(rot_sampling_points.shape[0]):
@@ -416,8 +429,11 @@ def generate_decision_zones_map_with_sampling_points(input_map,
     for i in range(sampling_points.shape[0]):
         if (sampling_points[i,1] < final_dec_map.shape[0]) and (sampling_points[i,0] < final_dec_map.shape[1]):
             if final_dec_map[sampling_points[i,1],sampling_points[i,0]] != 0:
+                
                 sampling_points[i, 1] = sampling_points[i, 1] + y_start
                 sampling_points[i, 0] = sampling_points[i, 0] + x_start
+                # sampling_points[i, 1] = sampling_points[i, 1] + y_start
+                # sampling_points[i, 0] = sampling_points[i, 0] + x_start
                 final_sampling_points.append(sampling_points[i].tolist())
             else:
                 sampling_points[i, 1] = sampling_points[i, 1] + y_start

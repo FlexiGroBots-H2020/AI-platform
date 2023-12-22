@@ -32,7 +32,7 @@ def main(number_of_zones, window_size, in_shape, in_raster_red, in_raster_green,
     folder_name = output_dir
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    out_shp = folder_name + "output" + current_datetime_str + ".shp"
+    out_shp = folder_name + "output_sampling_points.shp"
     zone_estimation(in_raster_red,
                     in_raster_green,
                     in_raster_blue,
