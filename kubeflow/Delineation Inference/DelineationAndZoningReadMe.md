@@ -14,4 +14,6 @@ These docker images were pushed to the project GitHub repo and can be found in [
 
 An IPYNB file is also necessary and it is included in the same folders in GitHub repo. This file is essential for connecting individual components. It consists of at least two major cells. In the first one it’s always important to check volume name in the code and change it to match with corresponding volume:
 
-The rest is the same as for Blueberry row detection training and test pipelines.
+The resulting zones and sampling points:
+
+![Zones and sampling points](https://github.com/Dimitrije2507/BlueberryRowDetectionKubeflow/blob/c9a1202dc079614375b7e56ef2ba2ece3e24e8d2/results_zones_and_sp.png)
