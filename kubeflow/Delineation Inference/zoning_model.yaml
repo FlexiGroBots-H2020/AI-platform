@@ -1,0 +1,61 @@
+name: Training
+description: Training code
+
+inputs:
+- {name: number_of_zones, type: int, description: 'no of zones'}
+- {name: window_size, type: float, description: 'scaling for qgis'}
+
+- {name: in_shape, type: String, description: 'in_shape'}
+- {name: in_raster_red, type: String, description: 'in_raster_red'}
+- {name: in_raster_green, type: String, description: 'in_raster_green'}
+- {name: in_raster_blue, type: String, description: 'in_raster_blue'}
+- {name: in_raster_nir, type: String, description: 'in_raster_nir'}
+- {name: in_raster_rededge, type: String, description: 'in_raster_rededge'}
+- {name: path_to_save, type: String, description: 'path_to_save'}
+- {name: new_location, type: list, description: 'test_location'}
+
+outputs:
+- {name: output1-path, type: list, description: 'outputPath'}
+
+
+implementation:
+  container:
+    image: ghcr.io/flexigrobots-h2020/delineation_and_zoning_component:latest
+    command: [
+      python, delineation_and_zones_main.py,
+      
+      --number_of_zones,
+      {inputValue: number_of_zones},
+      
+      --window_size,
+      {inputValue: window_size},
+      
+      --in_shape,
+      {inputValue: in_shape},
+      
+      --in_raster_red,
+      {inputValue: in_raster_red},
+      
+      --in_raster_green,
+      {inputValue: in_raster_green},
+      
+      --in_raster_blue,
+      {inputValue: in_raster_blue},
+      
+      --in_raster_nir,
+      {inputValue: in_raster_nir},
+      
+      --in_raster_rededge,
+      {inputValue: in_raster_rededge},
+      
+      --path_to_save,
+      {inputValue: path_to_save},
+      
+      --new_location,
+      {inputValue: new_location},
+      
+      --output1-path, 
+      {outputPath: output1-path},
+    ]
+    
+    

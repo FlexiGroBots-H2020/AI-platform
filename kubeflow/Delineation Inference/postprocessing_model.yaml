@@ -1,0 +1,31 @@
+name: PostProcessing
+description: PostProcessing results
+
+inputs:
+- {name: bucket_name, type: String, description: 'bucket_name'}
+- {name: file_path, type: String, description: 'file_path to dir that will be uploaded'}
+- {name: minio_path, type: String, description: 'path that dir will have on minio'}
+- {name: new_location, type: list, description: 'test_location'}
+#TODO: LOKACIJA NA MINIO
+
+
+implementation:
+  container:
+    image: ghcr.io/flexigrobots-h2020/delineation_push_component:latest
+    command: [
+      python, postProcessing.py,
+      
+      --bucket_name,
+      {inputValue: bucket_name},
+      
+      --file_path,
+      {inputValue: file_path},
+      
+      --minio_path,
+      {inputValue: minio_path},
+      
+      --new_location,
+      {inputValue: new_location},
+    ]
+    
+    

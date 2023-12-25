@@ -1,0 +1,35 @@
+name: PostProcessing
+description: PostProcessing results
+
+inputs:
+- {name: bucket_name, type: list, description: 'bucket_name'}
+- {name: log_location_tiff, type: list, description: 'log_location1'}
+- {name: log_location_colored_tiff, type: list, description: 'log_location2'}
+- {name: log_location_shp, type: list, description: 'log_location3'}
+- {name: new_location, type: list, description: 'test_location'}
+#TODO: LOKACIJA NA MINIO
+
+
+implementation:
+  container:
+    image: ghcr.io/flexigrobots-h2020/rebuild_test_push_component2:latest
+    command: [
+      python, PostProcessing.py,
+      
+      --bucket_name,
+      {inputValue: bucket_name},
+      
+      --log_location_tiff,
+      {inputValue: log_location_tiff},
+      
+      --log_location_colored_tiff,
+      {inputValue: log_location_colored_tiff},
+      
+      --log_location_shp,
+      {inputValue: log_location_shp},
+      
+      --new_location,
+      {inputValue: new_location}
+    ]
+    
+    

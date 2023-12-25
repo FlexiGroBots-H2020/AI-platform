@@ -1,0 +1,60 @@
+{
+    "save_checkpoint_freq": 1000,
+    "set_random_seed": 15,
+    "epochs": 5,
+    "use_mask": false,
+    "count_train": 0,
+    "count_train_tb": 0,
+    "count_val": 0,
+    "GPU_list": [
+        0
+    ],
+    "shuffle_state": 1,
+    "weight_decay": 0,
+    "batch_size": 8,
+    "es_min": 1000000000.0,
+    "es_check": 5,
+    "es_epoch_count": 0,
+    "optimizer_patience": 10,
+    "num_channels": 5,
+    "num_channels_lab": 1,
+    "img_h": 512,
+    "img_w": 512,
+    "img_size": [
+        512,
+        512
+    ],
+    "epoch_model_last_save": 0,
+    "scheduler_lr": "multiplicative",
+    "dataset": "Proba",
+    "tb_img_list": [
+        "svi_kanali_combo_8",
+        "svi_kanali_combo_8"
+    ],
+    "server": true,
+    "img_data_format": ".npy",
+    "net_type": "UNet3",
+    "device": "cuda",
+    "loss_type": "bce",
+    "numpy_path": "/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/proba/trening_set/img",
+    "numpy_valid_path": "/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/proba/validation_set/img",
+    "numpy_test_path": "/home/stefanovicd/DeepSleep/agrovision/DetekcijaBorovnica/proba/test_set/img",
+    "load_numpy": true,
+    "use_weights": false,
+    "do_testing": true,
+    "count_logs_flag": false,
+    "freeze_backbone_weights": false,
+    "zscore": false,
+    "binary": true,
+    "early_stop_flag": false,
+    "save_best_model": true,
+    "train_losses": [],
+    "validation_losses": [],
+    "classes_labels": [
+        "Borovnica"
+    ],
+    "classes_labels2": [
+        "background",
+        "Borovnica"
+    ]
+}
