@@ -310,7 +310,7 @@ We developed an inference service pipeline for calculating vegetation index(VI) 
 We developed an inference service pipeline for Delineation and zoning using UAV multispectral data/orthomosaics and ML techniques.
 [Steps for running delineation and zoning inference service](https://github.com/FlexiGroBots-H2020/AI-platform/blob/f0ee898c677df39067ee75a082ad6464f543f7c7/kubeflow/Delineation%20Inference/DelineationAndZoningReadMe.md) 
 
-## Delineation and zoning + Soil Sampling point generation
+
 
 
 
