@@ -1,0 +1,85 @@
+metadata:
+  name: katib-bbrow-detection-nettype2
+  namespace: lazarlemic2
+spec:
+  parameters:
+    - name: learning_rate
+      parameterType: double
+      feasibleSpace:
+        max: '0.002'
+        min: '0.001'
+        step: '0.001'
+    - name: net_type
+      parameterType: categorical
+      feasibleSpace:
+        list:
+          - UNet3
+          - SegNet
+          - PSPNet
+    - name: num_epochs
+      parameterType: int
+      feasibleSpace:
+        max: '6'
+        min: '3'
+        step: '1'
+  objective:
+    type: maximize
+    goal: 0.99
+    objectiveMetricName: accuracy
+    metricStrategies:
+      - name: accuracy
+        value: max
+  algorithm:
+    algorithmName: random
+  trialTemplate:
+    trialSpec:
+      apiVersion: batch/v1
+      kind: Job
+      spec:
+        template:
+          metadata:
+            annotations:
+              sidecar.istio.io/inject: 'false'
+          spec:
+            containers:
+              - command:
+                  - python3
+                  - Train_BGFG_BCE_with_weightsUnet3.py
+                  - '--learning_rate=${trialParameters.learningRate}'
+                  - '--num_epochs=${trialParameters.numEpochs}'
+                  - '--net_type=${trialParameters.netType}'
+                  - '--trening_location=trening_set_mini2/img'
+                  - '--validation_location=validation_set_mini2/img'
+                  - '--test_location=test_set_mini2/img'
+                  - '--new_location=/katib/mnist.log'
+                image: ghcr.io/flexigrobots-h2020/pipelinetesting3:latest
+                name: training-container
+            restartPolicy: Never
+    trialParameters:
+      - name: learningRate
+        description: Learning rate for the training model
+        reference: learning_rate
+      - name: numEpochs
+        description: number of epochs for training
+        reference: num_epochs
+      - name: netType
+        description: type of model
+        reference: net_type
+    primaryContainerName: training-container
+    successCondition: status.conditions.#(type=="Complete")#|#(status=="True")#
+    failureCondition: status.conditions.#(type=="Failed")#|#(status=="True")#
+  parallelTrialCount: 2
+  maxTrialCount: 5
+  maxFailedTrialCount: 3
+  metricsCollectorSpec:
+    source:
+      fileSystemPath:
+        path: /katib/mnist.log
+        kind: File
+        format: TEXT
+      filter:
+        metricsFormat:
+          - '{metricName: ([\w|-]+), metricValue: ((-?\d+)(\.\d+)?)}'
+    collector:
+      kind: File
+  resumePolicy: LongRunning

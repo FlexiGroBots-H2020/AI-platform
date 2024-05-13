@@ -1,0 +1,13 @@
+{
+    "test_losses": [],
+    "background_names": [],
+    "foreground_names": [],
+    "background_area": [],
+    "foreground_area": [],
+    "iou_per_test_image_fg": [],
+    "k_index": 1,
+    "binary": true,
+    "use_mask": false,
+    "dataset": "Proba",
+    "background_flag": false
+}
