@@ -29,6 +29,8 @@ def model_init(num_channels,num_channels_lab,img_h,img_w,zscore,net_type,device,
         
     segmentation_net.to(device)
     if server:
+        print("MODEL_INIT, ", end="")
+        print(GPU_list)
         segmentation_net = torch.nn.DataParallel(segmentation_net, device_ids=GPU_list)
 
     return segmentation_net
