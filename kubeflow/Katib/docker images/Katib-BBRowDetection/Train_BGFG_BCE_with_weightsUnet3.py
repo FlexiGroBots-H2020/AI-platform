@@ -16,7 +16,7 @@ def end_of_epoch_print(epoch,IOU):
     logging.info(ispis)
 
 def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num_epochs, loss_type,Batch_size, cfg):
-
+    print("MAIN STARTED: DEVICE IS " + cfg.device)
     #Setting the variables
     lr = lr
     lambda_parametri = lambda_p
@@ -32,6 +32,28 @@ def main(putanja_train, putanja_val, putanja_test, p_index,lr,lambda_p,step, num
     segmentation_net = model_init(cfg.num_channels, cfg.num_channels_lab, cfg.img_h, cfg.img_w, cfg.zscore,
                                 cfg.net_type, cfg.device, cfg.server, cfg.GPU_list)
     segmentation_net = torch.nn.DataParallel(segmentation_net, device_ids=[0]).to(cfg.device)
+    
+    import mlflow
+    from datetime import datetime
+    
+    
+    print('Set mlflow variables...')
+    mlflow.set_tracking_uri(r"http://mlflow-service.mlflow.svc.cluster.local:5000")
+    
+    # now = datetime.now()
+    # timestamp = now.strftime("%d/%m/%Y_%H:%M:%S") + "." + now.strftime("%f")[:3]
+    # mlflow.set_experiment(f"row-segmentation-{timestamp}")
+    
+    # print('Log model...')
+    # with mlflow.start_run():
+    #     mlflow.pytorch.log_model(segmentation_net, "row-segmentation")
+    #     run_id = mlflow.active_run().info.run_id
+    
+    # print('Registry model...')
+    # model_uri = f"runs:/{run_id}/row-segmentation"
+    # model_name = "row-segmentation"
+    # model_version = mlflow.register_model(model_uri, model_name)
+    
 
     optimizer, scheduler = optimizer_init(segmentation_net, lr, cfg.weight_decay, cfg.scheduler_lr, lambda_parametri, cfg.optimizer_patience)
     criterion = loss_init(cfg.use_weights, loss_type, cfg.dataset, cfg.num_channels_lab, cfg.device, cfg.use_mask)
