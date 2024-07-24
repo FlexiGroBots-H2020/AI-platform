@@ -1,0 +1,71 @@
+name: Training
+description: Training code
+
+inputs:
+- {name: LearningRate, type: list, description: 'Learning rate'}
+- {name: LambdaParametar, type: list, description: 'Lambda parametar'}
+- {name: StepoviArr, type: list, description: 'Stepovi arr'}
+
+- {name: num_epochs, type: list, description: 'num_epochs'}
+- {name: loss_type, type: list, description: 'Lloss_type'}
+- {name: Batch_size, type: list, description: 'Batch_size'}
+
+- {name: net_type, type: String, description: 'Type of Network that will be run'}
+- {name: device, type: String, description: 'will torch run on cuda (gpu) or cpu'}
+
+- {name: trening_location, type: String, description: 'trening_location'}
+- {name: validation_location, type: String, description: 'validation_location'}
+- {name: test_location, type: String, description: 'test_location'}
+- {name: new_location, type: String, description: 'new_location'}
+
+outputs:
+- {name: output1-path, type: list, description: 'Learning rate'}
+
+
+implementation:
+  container:
+    image: ghcr.io/flexigrobots-h2020/blueberry_rebuild_test1:latest
+    command: [
+      python, Train_BGFG_BCE_with_weightsUnet3.py,
+      
+      --learning_rate,
+      {inputValue: LearningRate},
+      
+      --lambda_parametar,
+      {inputValue: LambdaParametar},
+      
+      --stepovi_arr,
+      {inputValue: StepoviArr},
+      
+      --num_epochs,
+      {inputValue: num_epochs},
+      
+      --loss_type,
+      {inputValue: loss_type},
+      
+      --Batch_size,
+      {inputValue: Batch_size},
+      
+      --net_type,
+      {inputValue: net_type},
+      
+      --device,
+      {inputValue: device},
+      
+      --trening_location,
+      {inputValue: trening_location},
+      
+      --validation_location,
+      {inputValue: validation_location},
+      
+      --test_location,
+      {inputValue: test_location},
+      
+      --new_location,
+      {inputValue: new_location},
+      
+      --output1-path, 
+      {outputPath: output1-path},
+    ]
+    
+    

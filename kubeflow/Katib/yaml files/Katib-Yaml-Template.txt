@@ -1,0 +1,34 @@
+metricsCollectorSpec:
+    source:
+      fileSystemPath:
+        path: /katib/mnist.log
+        kind: File
+        format: TEXT
+      filter:
+        metricsFormat:
+          - '{metricName: ([\w|-]+), metricValue: ((-?\d+)(\.\d+)?)}'
+    collector:
+      kind: File
+
+
+trialSpec:
+      apiVersion: batch/v1
+      kind: Job
+      spec:
+        template:
+          metadata:
+            annotations:
+              sidecar.istio.io/inject: 'false'
+          spec:
+            containers:
+              - command:
+                  - python3
+                  - mnist.py
+                  - '--epochs=1'
+                  - '--log-path=/katib/mnist.log'
+                  - '--lr=${trialParameters.learningRate}'
+                  - '--momentum=${trialParameters.momentum}'
+                image: ghcr.io/flexigrobots-h2020/torchtesting2:latest
+                name: training-container
+            restartPolicy: Never
+

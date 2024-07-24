@@ -1,0 +1,12 @@
+name: myenv
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.8
+  - gdal
+  - matplotlib
+  - numpy
+  - pytorch
+  - torchvision
+  - segmentation-models-pytorch

@@ -1,0 +1,5 @@
+numpy
+torch
+torchvision
+segmentation_models_pytorch
+scikit-learn

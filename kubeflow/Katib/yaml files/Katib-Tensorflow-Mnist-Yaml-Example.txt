@@ -1,0 +1,73 @@
+metadata:
+  name: katib-tensorflow-mnist
+  namespace: lazarlemic2
+spec:
+  parameters:
+    - name: learning_rate
+      parameterType: double
+      feasibleSpace:
+        max: '0.05'
+        min: '0.01'
+  objective:
+    type: minimize
+    goal: 0.001
+    objectiveMetricName: loss
+    metricStrategies:
+      - name: loss
+        value: min
+  algorithm:
+    algorithmName: random
+  trialTemplate:
+    trialSpec:
+      apiVersion: kubeflow.org/v1
+      kind: TFJob
+      spec:
+        tfReplicaSpecs:
+          Chief:
+            replicas: 1
+            restartPolicy: OnFailure
+            template:
+              metadata:
+                annotations:
+                  sidecar.istio.io/inject: 'false'
+              spec:
+                containers:
+                  - command:
+                      - python
+                      - mnist.py
+                      - '--epochs=1'
+                      - '--learning-rate=${trialParameters.learningRate}'
+                    image: ghcr.io/flexigrobots-h2020/simple-katib-tensorflow:latest
+                    name: tensorflow
+          Worker:
+            replicas: 1
+            restartPolicy: OnFailure
+            template:
+              metadata:
+                annotations:
+                  sidecar.istio.io/inject: 'false'
+              spec:
+                containers:
+                  - command:
+                      - python
+                      - mnist.py
+                      - '--epochs=1'
+                      - '--learning-rate=${trialParameters.learningRate}'
+                    image: ghcr.io/flexigrobots-h2020/simple-katib-tensorflow:latest
+                    name: tensorflow
+    trialParameters:
+      - name: learningRate
+        description: Learning rate for the training model
+        reference: learning_rate
+    primaryPodLabels:
+      training.kubeflow.org/job-role: master
+    primaryContainerName: tensorflow
+    successCondition: status.conditions.#(type=="Succeeded")#|#(status=="True")#
+    failureCondition: status.conditions.#(type=="Failed")#|#(status=="True")#
+  parallelTrialCount: 2
+  maxTrialCount: 5
+  maxFailedTrialCount: 3
+  metricsCollectorSpec:
+    collector:
+      kind: StdOut
+  resumePolicy: LongRunning

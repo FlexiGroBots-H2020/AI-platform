@@ -1,0 +1,28 @@
+name: Download
+description: Download code
+
+
+inputs:
+- {name: bucket_name, type: list, description: 'Bucket Name'}
+- {name: save_location, type: list, description: 'save location'}
+
+outputs:
+- {name: output1-path, type: list, description: 'output'}
+
+implementation:
+  container:
+    image: ghcr.io/flexigrobots-h2020/rebuild_delineation_download_component:latest
+    command: [
+      python, download_data.py,
+
+      --bucket_name,
+      {inputValue: bucket_name},
+
+      --save_location,
+      {inputValue: save_location},
+
+      --output1_path, 
+      {outputPath: output1-path},
+    ]
+    
+    
